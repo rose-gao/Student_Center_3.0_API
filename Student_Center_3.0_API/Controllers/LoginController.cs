@@ -43,10 +43,18 @@ namespace Student_Center_3._0_API.Controllers
         }
 
         // PUT: api/Login/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // Use a DTO to eliminate circular reference b/w Login and Student tables
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutLogin(int id, Login login)
+        public async Task<IActionResult> PutLogin(int id, LoginDTO loginDTO)
         {
+            var login = new Login
+            {
+                studentNum = loginDTO.StudentNum,
+                userId = loginDTO.UserId,
+                password = loginDTO.Password
+
+            };
+            
             if (id != login.studentNum)
             {
                 return BadRequest();
@@ -74,7 +82,7 @@ namespace Student_Center_3._0_API.Controllers
         }
 
         // POST: api/Login
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // Use a DTO to eliminate circular reference b/w Login and Student tables
         [HttpPost]
         public async Task<ActionResult<Login>> PostLogin(LoginDTO loginDTO)
         {

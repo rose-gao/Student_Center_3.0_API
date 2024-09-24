@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Student_Center_3._0_API.DTOs;
 using Student_Center_3._0_API.Models;
 
 namespace Student_Center_3._0_API.Controllers
@@ -42,10 +43,27 @@ namespace Student_Center_3._0_API.Controllers
         }
 
         // PUT: api/Student/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // Use a DTO to eliminate circular reference b/w Login and Student tables
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutStudent(int id, Student student)
+        public async Task<IActionResult> PutStudent(int id, StudentDTO studentDTO)
         {
+            var student = new Student
+            {
+                studentNum = studentDTO.studentNum,
+                firstName = studentDTO.firstName,
+                middleName = studentDTO.middleName,
+                lastName = studentDTO.lastName,
+                birthday = studentDTO.birthday,
+                socialInsuranceNum = studentDTO.socialInsuranceNum,
+                email = studentDTO.email,
+                phoneNum = studentDTO.phoneNum,
+                streetAddress = studentDTO.streetAddress,
+                city = studentDTO.city,
+                province = studentDTO.province,
+                postalCode = studentDTO.postalCode
+
+            };
+
             if (id != student.studentNum)
             {
                 return BadRequest();
@@ -73,12 +91,29 @@ namespace Student_Center_3._0_API.Controllers
         }
 
         // POST: api/Student
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // Use a DTO to eliminate circular reference b/w Login and Student tables
         [HttpPost]
-        public async Task<ActionResult<Student>> PostStudent(Student student)
+        public async Task<ActionResult<Student>> PostStudent(StudentDTO studentDTO)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
+                var student = new Student
+                {
+                    studentNum = studentDTO.studentNum,
+                    firstName = studentDTO.firstName,
+                    middleName = studentDTO.middleName,
+                    lastName = studentDTO.lastName,
+                    birthday = studentDTO.birthday,
+                    socialInsuranceNum = studentDTO.socialInsuranceNum,
+                    email = studentDTO.email,
+                    phoneNum = studentDTO.phoneNum, 
+                    streetAddress = studentDTO.streetAddress,
+                    city = studentDTO.city,
+                    province = studentDTO.province,
+                    postalCode = studentDTO.postalCode                   
+
+                };
+
                 try
                 {
                     await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Students ON");
