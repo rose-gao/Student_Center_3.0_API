@@ -9,7 +9,7 @@ using Student_Center_3._0_API.Models;
 
 namespace Student_Center_3._0_API.Migrations
 {
-    [DbContext(typeof(StudentContext))]
+    [DbContext(typeof(StudentCenterContext))]
     partial class StudentContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -20,6 +20,24 @@ namespace Student_Center_3._0_API.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Student_Center_3._0_API.Models.Login", b =>
+                {
+                    b.Property<int>("studentNum")
+                        .HasColumnType("int");
+
+                    b.Property<string>("password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(15)");
+
+                    b.HasKey("studentNum");
+
+                    b.ToTable("Logins");
+                });
 
             modelBuilder.Entity("Student_Center_3._0_API.Models.Student", b =>
                 {
@@ -75,6 +93,23 @@ namespace Student_Center_3._0_API.Migrations
                     b.HasKey("studentNum");
 
                     b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("Student_Center_3._0_API.Models.Login", b =>
+                {
+                    b.HasOne("Student_Center_3._0_API.Models.Student", "Student")
+                        .WithOne("Login")
+                        .HasForeignKey("Student_Center_3._0_API.Models.Login", "studentNum")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Student_Center_3._0_API.Models.Student", b =>
+                {
+                    b.Navigation("Login")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

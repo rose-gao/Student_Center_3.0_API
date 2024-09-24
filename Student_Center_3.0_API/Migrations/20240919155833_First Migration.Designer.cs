@@ -10,7 +10,7 @@ using Student_Center_3._0_API.Models;
 
 namespace Student_Center_3._0_API.Migrations
 {
-    [DbContext(typeof(StudentContext))]
+    [DbContext(typeof(StudentCenterContext))]
     [Migration("20240919155833_First Migration")]
     partial class FirstMigration
     {

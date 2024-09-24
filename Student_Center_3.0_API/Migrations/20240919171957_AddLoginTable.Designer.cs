@@ -11,8 +11,8 @@ using Student_Center_3._0_API.Models;
 namespace Student_Center_3._0_API.Migrations
 {
     [DbContext(typeof(StudentCenterContext))]
-    [Migration("20240919160931_Second Migration")]
-    partial class SecondMigration
+    [Migration("20240919171957_AddLoginTable")]
+    partial class AddLoginTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,6 +23,24 @@ namespace Student_Center_3._0_API.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Student_Center_3._0_API.Models.Login", b =>
+                {
+                    b.Property<int>("studentNum")
+                        .HasColumnType("int");
+
+                    b.Property<string>("password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(15)");
+
+                    b.HasKey("studentNum");
+
+                    b.ToTable("Logins");
+                });
 
             modelBuilder.Entity("Student_Center_3._0_API.Models.Student", b =>
                 {
@@ -57,7 +75,7 @@ namespace Student_Center_3._0_API.Migrations
 
                     b.Property<string>("phoneNum")
                         .IsRequired()
-                        .HasColumnType("nvarchar(9)");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("postalCode")
                         .IsRequired()
@@ -78,6 +96,23 @@ namespace Student_Center_3._0_API.Migrations
                     b.HasKey("studentNum");
 
                     b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("Student_Center_3._0_API.Models.Login", b =>
+                {
+                    b.HasOne("Student_Center_3._0_API.Models.Student", "Student")
+                        .WithOne("Login")
+                        .HasForeignKey("Student_Center_3._0_API.Models.Login", "studentNum")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Student_Center_3._0_API.Models.Student", b =>
+                {
+                    b.Navigation("Login")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

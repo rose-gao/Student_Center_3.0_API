@@ -13,9 +13,9 @@ namespace Student_Center_3._0_API.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
-        private readonly StudentContext _context;
+        private readonly StudentCenterContext _context;
 
-        public StudentController(StudentContext context)
+        public StudentController(StudentCenterContext context)
         {
             _context = context;
         }
@@ -97,9 +97,7 @@ namespace Student_Center_3._0_API.Controllers
                 }
 
             }
-            
-
-            
+                        
         }
 
         // DELETE: api/Student/5

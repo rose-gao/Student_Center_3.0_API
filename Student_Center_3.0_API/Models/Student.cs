@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Student_Center_3._0_API.Models
 {
@@ -41,5 +42,8 @@ namespace Student_Center_3._0_API.Models
 
         [Column(TypeName = "nvarchar(7)")]
         public string postalCode {  get; set; }
+
+        [JsonIgnore]
+        public virtual Login Login { get; set; }
     }
 }
