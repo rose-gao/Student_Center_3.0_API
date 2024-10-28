@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Student_Center_3._0_API.DTOs
 {
-    public class StudentDTO
+    public class UserDTO
     {
-        public int studentNum { get; set; }
+        public int userNum { get; set; }
 
         public string firstName { get; set; }
 
@@ -28,6 +28,8 @@ namespace Student_Center_3._0_API.DTOs
         public string province { get; set; }
 
         public string postalCode { get; set; }
+
+        public bool isAdmin { get; set; }
 
     }
 

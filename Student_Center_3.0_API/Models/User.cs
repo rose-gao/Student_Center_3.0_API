@@ -2,12 +2,13 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
+// TODO: Make Courses table, Enrollment Table + Enrollment History (with Many-to-Many relationship with User)
 namespace Student_Center_3._0_API.Models
 {
-    public class Student
+    public class User
     {
         [Key]
-        public int studentNum {  get; set; }
+        public int userNum {  get; set; }
 
         [Column(TypeName = "nvarchar(60)")]
         public string firstName { get; set; }
@@ -42,6 +43,8 @@ namespace Student_Center_3._0_API.Models
 
         [Column(TypeName = "nvarchar(7)")]
         public string postalCode {  get; set; }
+
+        public bool isAdmin {  get; set; }
 
         [JsonIgnore]
         public virtual Login Login { get; set; }

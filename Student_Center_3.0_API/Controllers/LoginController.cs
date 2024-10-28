@@ -29,10 +29,10 @@ namespace Student_Center_3._0_API.Controllers
         }
 
         // GET: api/Login/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Login>> GetLogin(int id)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<Login>> GetLogin(string userId)
         {
-            var login = await _context.Logins.FindAsync(id);
+            var login = await _context.Logins.FindAsync(userId);
 
             if (login == null)
             {
@@ -44,18 +44,18 @@ namespace Student_Center_3._0_API.Controllers
 
         // PUT: api/Login/5
         // Use a DTO to eliminate circular reference b/w Login and Student tables
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutLogin(int id, LoginDTO loginDTO)
+        [HttpPut("{userId}")]
+        public async Task<IActionResult> PutLogin(string userId, LoginDTO loginDTO)
         {
             var login = new Login
             {
-                studentNum = loginDTO.StudentNum,
                 userId = loginDTO.UserId,
-                password = loginDTO.Password
+                password = loginDTO.Password,
+                userNum = loginDTO.userNum,
 
             };
             
-            if (id != login.studentNum)
+            if (userId != login.userId)
             {
                 return BadRequest();
             }
@@ -68,7 +68,7 @@ namespace Student_Center_3._0_API.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!LoginExists(id))
+                if (!LoginExists(userId))
                 {
                     return NotFound();
                 }
@@ -88,9 +88,9 @@ namespace Student_Center_3._0_API.Controllers
         {
             var login = new Login
             {
-                studentNum = loginDTO.StudentNum,
                 userId = loginDTO.UserId,
-                password = loginDTO.Password
+                password = loginDTO.Password,
+                userNum = loginDTO.userNum,
 
             };
             _context.Logins.Add(login);
@@ -100,7 +100,7 @@ namespace Student_Center_3._0_API.Controllers
             }
             catch (DbUpdateException)
             {
-                if (LoginExists(login.studentNum))
+                if (LoginExists(login.userId))
                 {
                     return Conflict();
                 }
@@ -110,14 +110,14 @@ namespace Student_Center_3._0_API.Controllers
                 }
             }
 
-            return CreatedAtAction("GetLogin", new { id = login.studentNum }, login);
+            return CreatedAtAction("GetLogin", new { id = login.userNum }, login);
         }
 
         // DELETE: api/Login/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteLogin(int id)
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> DeleteLogin(string userId)
         {
-            var login = await _context.Logins.FindAsync(id);
+            var login = await _context.Logins.FindAsync(userId);
             if (login == null)
             {
                 return NotFound();
@@ -129,9 +129,9 @@ namespace Student_Center_3._0_API.Controllers
             return NoContent();
         }
 
-        private bool LoginExists(int id)
+        private bool LoginExists(string userId)
         {
-            return _context.Logins.Any(e => e.studentNum == id);
+            return _context.Logins.Any(e => e.userId == userId);
         }
     }
 }
