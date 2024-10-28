@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Student_Center_3._0_API.DTOs
+namespace Student_Center_3._0_Database.DTOs
 {
     public class UserDTO
     {

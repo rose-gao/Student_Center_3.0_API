@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Student_Center_3._0_API.DTOs;
-using Student_Center_3._0_API.Models;
+using Student_Center_3._0_Database.DTOs;
+using Student_Center_3._0_Database.Models;
 
 // TODO: REFACTOR TO USER
 
-namespace Student_Center_3._0_API.Controllers
+namespace Student_Center_3._0_Database.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -136,7 +136,7 @@ namespace Student_Center_3._0_API.Controllers
                 }
 
             }
-                        
+
         }
 
         // DELETE: api/User/5

@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Student_Center_3._0_API.DTOs;
-using Student_Center_3._0_API.Models;
+using Student_Center_3._0_Database.DTOs;
+using Student_Center_3._0_Database.Models;
 
-namespace Student_Center_3._0_API.Controllers
+namespace Student_Center_3._0_Database.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -54,7 +54,7 @@ namespace Student_Center_3._0_API.Controllers
                 userNum = loginDTO.userNum,
 
             };
-            
+
             if (userId != login.userId)
             {
                 return BadRequest();
@@ -110,7 +110,7 @@ namespace Student_Center_3._0_API.Controllers
                 }
             }
 
-            return CreatedAtAction("GetLogin", new { id = login.userNum }, login);
+            return CreatedAtAction("GetLogin", new { userId = login.userId }, login);
         }
 
         // DELETE: api/Login/5

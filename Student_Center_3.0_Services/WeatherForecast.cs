@@ -1,4 +1,4 @@
-namespace Student_Center_3._0_API
+namespace Student_Center_3._0_Services
 {
     public class WeatherForecast
     {
