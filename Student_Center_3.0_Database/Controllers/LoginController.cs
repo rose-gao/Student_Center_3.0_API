@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using Student_Center_3._0_Database.DTOs;
 using Student_Center_3._0_Database.Models;
@@ -50,7 +52,7 @@ namespace Student_Center_3._0_Database.Controllers
             var login = new Login
             {
                 userId = loginDTO.UserId,
-                password = loginDTO.Password,
+                password = EncryptPassword(loginDTO.Password),
                 userNum = loginDTO.userNum,
 
             };
@@ -89,7 +91,7 @@ namespace Student_Center_3._0_Database.Controllers
             var login = new Login
             {
                 userId = loginDTO.UserId,
-                password = loginDTO.Password,
+                password = EncryptPassword(loginDTO.Password),
                 userNum = loginDTO.userNum,
 
             };
@@ -132,6 +134,15 @@ namespace Student_Center_3._0_Database.Controllers
         private bool LoginExists(string userId)
         {
             return _context.Logins.Any(e => e.userId == userId);
+        }
+
+        private string EncryptPassword(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedBytes);
+            }
         }
     }
 }
