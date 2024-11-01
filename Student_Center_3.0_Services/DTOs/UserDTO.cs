@@ -1,0 +1,31 @@
+﻿namespace Student_Center_3._0_Services.DTOs
+{
+    public class UserDTO
+    {
+        public int userNum { get; set; }
+
+        public string firstName { get; set; }
+
+        public string? middleName { get; set; }
+
+        public string lastName { get; set; }
+
+        public string birthday { get; set; }
+
+        public string socialInsuranceNum { get; set; }
+
+        public string email { get; set; }
+
+        public string phoneNum { get; set; }
+
+        public string streetAddress { get; set; }
+
+        public string city { get; set; }
+
+        public string province { get; set; }
+
+        public string postalCode { get; set; }
+
+        public bool isAdmin { get; set; }
+    }
+}

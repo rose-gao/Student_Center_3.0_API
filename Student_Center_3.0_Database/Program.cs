@@ -12,7 +12,19 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<StudentCenterContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
 
+/*
+//temp.GenerateKeyAndIV();
+
+// Allows services to be registered in controllers
+builder.Services.AddControllersWithViews();
+
+// Register a Singleton service (only one instance for the application lifetime),
+// service is an instance of IConiguration, which holds all key-value pairs from appsettings.json
+builder.Services.AddSingleton(builder.Configuration);
+*/
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

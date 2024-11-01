@@ -23,7 +23,7 @@ namespace Student_Center_3._0_Database.Models
         [Column(TypeName = "nvarchar(10)")]
         public string birthday { get; set; }
 
-        [Column(TypeName = "nvarchar(9)")]
+        [Column(TypeName = "nvarchar(256)")]
         public string socialInsuranceNum { get; set; }
 
         [Column(TypeName = "nvarchar(25)")]

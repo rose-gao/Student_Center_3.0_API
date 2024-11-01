@@ -15,7 +15,7 @@ namespace Student_Center_3._0_Services.Controllers
             _loginService = loginService;
         }
 
-        [HttpPost("ValidateLogin")]
+        [HttpGet("ValidateLogin")]
         public async Task<IActionResult> ValidateLogin(string userId, string password)
         {
             var userNum = await _loginService.ValidateUserCredentialsAsync(userId, password);

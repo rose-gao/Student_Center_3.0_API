@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Student_Center_3._0_Database.Models;
 
@@ -10,9 +11,11 @@ using Student_Center_3._0_Database.Models;
 namespace Student_Center_3._0_API.Migrations
 {
     [DbContext(typeof(StudentCenterContext))]
-    partial class StudentContextModelSnapshot : ModelSnapshot
+    [Migration("20241031223855_alter nvarchar length for SIN")]
+    partial class alternvarcharlengthforSIN
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
