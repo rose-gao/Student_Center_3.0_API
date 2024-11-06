@@ -36,9 +36,6 @@ namespace Student_Center_3._0_Database.Models
         public string courseSemester { get; set; }
 
         [Column(TypeName = "nvarchar(60)")]
-        public string courseDay { get; set; }
-
-        [Column(TypeName = "nvarchar(60)")]
         public string courseTime { get; set; }
 
         [Column(TypeName = "nvarchar(60)")]

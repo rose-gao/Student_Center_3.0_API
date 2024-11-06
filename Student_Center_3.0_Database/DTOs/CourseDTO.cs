@@ -12,7 +12,6 @@ namespace Student_Center_3._0_Database.DTOs
         public string prerequisites { get; set; }
         public string antirequisites { get; set; }
         public string courseSemester { get; set; }
-        public string courseDay { get; set; }
         public string courseTime { get; set; } 
         public string? instructor { get; set; }
         public string? room { get; set; }
