@@ -14,9 +14,9 @@ namespace Student_Center_3._0_Database.Models
         public DbSet<CoursePrereq> CoursePrereqs { get; set; }
         public DbSet<PrereqGroup> PrereqGroups { get; set; } 
 
-        // Implement one-to-one relationship b/w Student & Login; initialize Login's Foreign Key
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // initialize foreign key in Login
             modelBuilder.Entity<User>()
                 .HasOne(s => s.Login)
                 .WithOne(l => l.User)
@@ -24,23 +24,24 @@ namespace Student_Center_3._0_Database.Models
                 .IsRequired();
             base.OnModelCreating(modelBuilder);
 
-            // Composite key for CoursePrerequisite
+            // Initialize Composite Key for CoursePrereq
+            // necessary for groupId to be part of composite key?
             modelBuilder.Entity<CoursePrereq>()
-                .HasKey(cp => new { cp.CourseNum, cp.PrerequisiteNum, cp.GroupId });
+                .HasKey(cp => new { cp.courseName, cp.prerequisite });
 
-            // One-to-many relationship between Course and CoursePrerequisite
+            // Initialize foreign key "course" in CoursePrereq + one : many relationship between courses : prerequisites
             modelBuilder.Entity<CoursePrereq>()
                 .HasOne(cp => cp.Course)
-                .WithMany(c => c.Prerequisites)
-                .HasForeignKey(cp => cp.CourseNum)
-                .OnDelete(DeleteBehavior.Restrict);
+                .WithMany(c => c.CoursePrereqs)
+                .HasForeignKey(cp => cp.courseName)
+                .HasPrincipalKey(c => c.courseName)
+                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade deletion if a course is removed
 
-            // Relationship between CoursePrerequisite and PrerequisiteGroup
+            // Initialize foreign key "groupId" in CoursePrerq + one : many relationship between PrereqGroup entry : CoursePrereq entries
             modelBuilder.Entity<CoursePrereq>()
                 .HasOne(cp => cp.PrereqGroup)
                 .WithMany(pg => pg.CoursePrereqs)
-                .HasForeignKey(cp => cp.GroupId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(cp => cp.groupId);
         }
     }
 }

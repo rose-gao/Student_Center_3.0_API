@@ -13,24 +13,25 @@ namespace Student_Center_3._0_Database.Models
     ///     3       |       CREDITS         |           1.0
     ///     
     /// CoursePreqrequisites
-    /// courseNum   |       prerequisiteNum     |       groupId
+    /// course      |       prerequisite        |       groupId
     ///     A       |           B               |       1
     ///     A       |           C               |       1
-    ///     A       |           NULL            |       2
+    ///     A       |           group 1         |       2
     ///     A       |           D               |       3
     ///     A       |           E               |       3
     ///     A       |           F               |       3  
+    ///     A       |           group 3         |       2
     /// </summary>
     public class PrereqGroup
     {
         [Key]
-        public int GroupId { get; set; }
+        public int groupId { get; set; }
 
         [Required]
         [StringLength(20)]
-        public string GroupType { get; set; } // "AND", "OR", "CREDITS"
+        public string groupType { get; set; } // "AND", "OR", "CREDITS"
 
-        public double? CreditRequirement { get; set; } // Only for "CREDITS" type
+        public double? creditRequirement { get; set; } // Only for "CREDITS" type
 
         // Navigation property: allows access and iteration through all the CoursePrereq
         // records associated with that group

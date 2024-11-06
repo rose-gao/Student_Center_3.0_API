@@ -3,20 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Student_Center_3._0_Database.Models;
 
 #nullable disable
 
-namespace Student_Center_3._0_API.Migrations
+namespace Student_Center_3._0_Database.Migrations
 {
     [DbContext(typeof(StudentCenterContext))]
-    [Migration("20241105173802_Course tables")]
-    partial class Coursetables
+    partial class StudentCenterContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +31,6 @@ namespace Student_Center_3._0_API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("courseNum"));
 
                     b.Property<string>("antirequisites")
-                        .IsRequired()
                         .HasColumnType("nvarchar(MAX)");
 
                     b.Property<string>("courseDay")
@@ -52,6 +48,10 @@ namespace Student_Center_3._0_API.Migrations
                     b.Property<string>("courseSemester")
                         .IsRequired()
                         .HasColumnType("nvarchar(60)");
+
+                    b.Property<string>("courseSuffix")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(3)");
 
                     b.Property<string>("courseTime")
                         .IsRequired()
@@ -74,7 +74,6 @@ namespace Student_Center_3._0_API.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("prerequisites")
-                        .IsRequired()
                         .HasColumnType("nvarchar(MAX)");
 
                     b.Property<string>("room")
@@ -90,22 +89,20 @@ namespace Student_Center_3._0_API.Migrations
 
             modelBuilder.Entity("Student_Center_3._0_Database.Models.CoursePrereq", b =>
                 {
-                    b.Property<int>("CourseNum")
-                        .HasColumnType("int")
+                    b.Property<string>("courseName")
+                        .HasColumnType("nvarchar(60)")
                         .HasColumnOrder(0);
 
-                    b.Property<int?>("PrerequisiteNum")
-                        .HasColumnType("int")
+                    b.Property<string>("prerequisite")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(1);
 
-                    b.Property<int>("GroupId")
+                    b.Property<int>("groupId")
                         .HasColumnType("int");
 
-                    b.HasKey("CourseNum", "PrerequisiteNum", "GroupId");
+                    b.HasKey("courseName", "prerequisite");
 
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("PrerequisiteNum");
+                    b.HasIndex("groupId");
 
                     b.ToTable("CoursePrereqs");
                 });
@@ -132,21 +129,21 @@ namespace Student_Center_3._0_API.Migrations
 
             modelBuilder.Entity("Student_Center_3._0_Database.Models.PrereqGroup", b =>
                 {
-                    b.Property<int>("GroupId")
+                    b.Property<int>("groupId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GroupId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("groupId"));
 
-                    b.Property<double?>("CreditRequirement")
+                    b.Property<double?>("creditRequirement")
                         .HasColumnType("float");
 
-                    b.Property<string>("GroupType")
+                    b.Property<string>("groupType")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.HasKey("GroupId");
+                    b.HasKey("groupId");
 
                     b.ToTable("PrereqGroups");
                 });
@@ -213,28 +210,21 @@ namespace Student_Center_3._0_API.Migrations
             modelBuilder.Entity("Student_Center_3._0_Database.Models.CoursePrereq", b =>
                 {
                     b.HasOne("Student_Center_3._0_Database.Models.Course", "Course")
-                        .WithMany("Prerequisites")
-                        .HasForeignKey("CourseNum")
+                        .WithMany("CoursePrereqs")
+                        .HasForeignKey("courseName")
+                        .HasPrincipalKey("courseName")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Student_Center_3._0_Database.Models.PrereqGroup", "PrereqGroup")
                         .WithMany("CoursePrereqs")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Student_Center_3._0_Database.Models.Course", "PrerequisiteCourse")
-                        .WithMany()
-                        .HasForeignKey("PrerequisiteNum")
+                        .HasForeignKey("groupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Course");
 
                     b.Navigation("PrereqGroup");
-
-                    b.Navigation("PrerequisiteCourse");
                 });
 
             modelBuilder.Entity("Student_Center_3._0_Database.Models.Login", b =>
@@ -250,7 +240,7 @@ namespace Student_Center_3._0_API.Migrations
 
             modelBuilder.Entity("Student_Center_3._0_Database.Models.Course", b =>
                 {
-                    b.Navigation("Prerequisites");
+                    b.Navigation("CoursePrereqs");
                 });
 
             modelBuilder.Entity("Student_Center_3._0_Database.Models.PrereqGroup", b =>

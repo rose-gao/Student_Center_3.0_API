@@ -7,22 +7,19 @@ namespace Student_Center_3._0_Database.Models
     {
         [Key]
         [Column(Order = 0)]
-        public int CourseNum { get; set; } // FK to Course
+        public string courseName { get; set; } // FK to Course
 
         [Key]
         [Column(Order = 1)]
-        public int PrerequisiteNum { get; set; } // FK to Course (prerequisite)
+        public string prerequisite { get; set; } // either a course or a group
 
-        public int GroupId { get; set; } // FK to PrerequisiteGroup
+        public int groupId { get; set; } // FK to PrereqGroup
 
         // Navigation properties: allows the full attributes of the object to be easily accessed
-        [ForeignKey("CourseNum")]
+        [ForeignKey("courseName")]
         public Course Course { get; set; }
 
-        [ForeignKey("PrerequisiteNum")]
-        public Course PrerequisiteCourse { get; set; }
-
-        [ForeignKey("GroupId")]
+        [ForeignKey("groupId")]
         public PrereqGroup PrereqGroup { get; set; }
     }
 }

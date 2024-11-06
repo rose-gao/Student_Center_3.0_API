@@ -12,10 +12,11 @@ namespace Student_Center_3._0_Database.Models
         [Column(TypeName = "nvarchar(256)")]
         public string password { get; set; }
 
-        [ForeignKey("User")]
+        
         public int userNum { get; set; }
 
         [JsonIgnore]
+        [ForeignKey("userNum")]
         public virtual User User { get; set; }
 
     }
