@@ -54,6 +54,7 @@ namespace Student_Center_3._0_Database.Controllers
                 courseNum = id,
                 courseName = courseDTO.courseName,
                 courseSuffix = courseDTO.courseSuffix,
+                courseAlias = courseDTO.courseAlias,
                 courseDesc = courseDTO.courseDesc,
                 extraInformation = courseDTO.extraInformation,
                 prerequisites = courseDTO.prerequisites,
@@ -104,6 +105,7 @@ namespace Student_Center_3._0_Database.Controllers
                 {
                     courseName = courseDTO.courseName,
                     courseSuffix = courseDTO.courseSuffix,
+                    courseAlias = courseDTO.courseAlias,
                     courseDesc = courseDTO.courseDesc,
                     extraInformation = courseDTO.extraInformation,
                     prerequisites = courseDTO.prerequisites,

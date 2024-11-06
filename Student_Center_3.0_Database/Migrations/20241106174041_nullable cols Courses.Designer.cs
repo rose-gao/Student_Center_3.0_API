@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Student_Center_3._0_Database.Models;
 
@@ -11,9 +12,11 @@ using Student_Center_3._0_Database.Models;
 namespace Student_Center_3._0_Database.Migrations
 {
     [DbContext(typeof(StudentCenterContext))]
-    partial class StudentCenterContextModelSnapshot : ModelSnapshot
+    [Migration("20241106174041_nullable cols Courses")]
+    partial class nullablecolsCourses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,10 +35,6 @@ namespace Student_Center_3._0_Database.Migrations
 
                     b.Property<string>("antirequisites")
                         .HasColumnType("nvarchar(MAX)");
-
-                    b.Property<string>("courseAlias")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(60)");
 
                     b.Property<string>("courseDesc")
                         .HasColumnType("nvarchar(MAX)");

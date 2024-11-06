@@ -18,11 +18,14 @@ namespace Student_Center_3._0_Database.Models
         [Column(TypeName = "nvarchar(3)")]
         public string courseSuffix { get; set; }
 
-        [Column(TypeName = "nvarchar(MAX)")]
-        public string courseDesc { get; set; }
+        [Column(TypeName = "nvarchar(60)")]
+        public string courseAlias { get; set; }
 
         [Column(TypeName = "nvarchar(MAX)")]
-        public string extraInformation { get; set; }
+        public string? courseDesc { get; set; }
+
+        [Column(TypeName = "nvarchar(MAX)")]
+        public string? extraInformation { get; set; }
 
         [Column(TypeName = "nvarchar(MAX)")]
         public string? prerequisites { get; set; }

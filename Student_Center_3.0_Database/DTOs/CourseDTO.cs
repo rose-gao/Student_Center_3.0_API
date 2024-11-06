@@ -7,6 +7,7 @@ namespace Student_Center_3._0_Database.DTOs
     {
         public string courseName { get; set; }
         public string courseSuffix { get; set; }
+        public string courseAlias{ get; set; }
         public string courseDesc { get; set; }
         public string extraInformation { get; set; }
         public string prerequisites { get; set; }
