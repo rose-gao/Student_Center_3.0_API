@@ -12,8 +12,8 @@ using Student_Center_3._0_Database.Models;
 namespace Student_Center_3._0_Database.Migrations
 {
     [DbContext(typeof(StudentCenterContext))]
-    [Migration("20241106174456_add courseAlias")]
-    partial class addcourseAlias
+    [Migration("20241107030323_First Migration")]
+    partial class FirstMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,7 +49,7 @@ namespace Student_Center_3._0_Database.Migrations
 
                     b.Property<string>("courseSemester")
                         .IsRequired()
-                        .HasColumnType("nvarchar(60)");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("courseSuffix")
                         .IsRequired()
@@ -57,19 +57,16 @@ namespace Student_Center_3._0_Database.Migrations
 
                     b.Property<string>("courseTime")
                         .IsRequired()
-                        .HasColumnType("nvarchar(60)");
+                        .HasColumnType("nvarchar(150)");
 
-                    b.Property<int>("courseWeight")
-                        .HasColumnType("int");
+                    b.Property<double>("courseWeight")
+                        .HasColumnType("float");
 
                     b.Property<string>("extraInformation")
                         .HasColumnType("nvarchar(MAX)");
 
                     b.Property<string>("instructor")
                         .HasColumnType("nvarchar(60)");
-
-                    b.Property<bool>("isLab")
-                        .HasColumnType("bit");
 
                     b.Property<int>("numEnrolled")
                         .HasColumnType("int");
@@ -91,17 +88,22 @@ namespace Student_Center_3._0_Database.Migrations
             modelBuilder.Entity("Student_Center_3._0_Database.Models.CoursePrereq", b =>
                 {
                     b.Property<string>("courseName")
-                        .HasColumnType("nvarchar(60)")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(0);
 
                     b.Property<string>("prerequisite")
                         .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(1);
 
+                    b.Property<int?>("courseNum")
+                        .HasColumnType("int");
+
                     b.Property<int>("groupId")
                         .HasColumnType("int");
 
                     b.HasKey("courseName", "prerequisite");
+
+                    b.HasIndex("courseNum");
 
                     b.HasIndex("groupId");
 
@@ -210,20 +212,15 @@ namespace Student_Center_3._0_Database.Migrations
 
             modelBuilder.Entity("Student_Center_3._0_Database.Models.CoursePrereq", b =>
                 {
-                    b.HasOne("Student_Center_3._0_Database.Models.Course", "Course")
+                    b.HasOne("Student_Center_3._0_Database.Models.Course", null)
                         .WithMany("CoursePrereqs")
-                        .HasForeignKey("courseName")
-                        .HasPrincipalKey("courseName")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("courseNum");
 
                     b.HasOne("Student_Center_3._0_Database.Models.PrereqGroup", "PrereqGroup")
                         .WithMany("CoursePrereqs")
                         .HasForeignKey("groupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Course");
 
                     b.Navigation("PrereqGroup");
                 });

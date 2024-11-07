@@ -29,6 +29,8 @@ namespace Student_Center_3._0_Database.Models
             modelBuilder.Entity<CoursePrereq>()
                 .HasKey(cp => new { cp.courseName, cp.prerequisite });
 
+
+            /*
             // Initialize foreign key "course" in CoursePrereq + one : many relationship between courses : prerequisites
             modelBuilder.Entity<CoursePrereq>()
                 .HasOne(cp => cp.Course)
@@ -36,6 +38,7 @@ namespace Student_Center_3._0_Database.Models
                 .HasForeignKey(cp => cp.courseName)
                 .HasPrincipalKey(c => c.courseName)
                 .OnDelete(DeleteBehavior.Restrict); // Prevents cascade deletion if a course is removed
+            */
 
             // Initialize foreign key "groupId" in CoursePrerq + one : many relationship between PrereqGroup entry : CoursePrereq entries
             modelBuilder.Entity<CoursePrereq>()

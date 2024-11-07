@@ -7,7 +7,7 @@ namespace Student_Center_3._0_Database.Models
     {
         [Key]
         [Column(Order = 0)]
-        public string courseName { get; set; } // FK to Course
+        public string courseName { get; set; } // Not a Foreign Key (FK) due to lack of uniqueness in courseNames of Course table
 
         [Key]
         [Column(Order = 1)]
@@ -15,9 +15,11 @@ namespace Student_Center_3._0_Database.Models
 
         public int groupId { get; set; } // FK to PrereqGroup
 
+        /*
         // Navigation properties: allows the full attributes of the object to be easily accessed
         [ForeignKey("courseName")]
         public Course Course { get; set; }
+        */
 
         [ForeignKey("groupId")]
         public PrereqGroup PrereqGroup { get; set; }

@@ -33,12 +33,12 @@ namespace Student_Center_3._0_Database.Models
         [Column(TypeName = "nvarchar(MAX)")]
         public string? antirequisites { get; set; }
 
-        public int courseWeight { get; set; }
+        public double courseWeight { get; set; }
 
-        [Column(TypeName = "nvarchar(60)")]
+        [Column(TypeName = "nvarchar(100)")]
         public string courseSemester { get; set; }
 
-        [Column(TypeName = "nvarchar(60)")]
+        [Column(TypeName = "nvarchar(150)")]
         public string courseTime { get; set; }
 
         [Column(TypeName = "nvarchar(60)")]
@@ -51,11 +51,9 @@ namespace Student_Center_3._0_Database.Models
 
         public int totalSeats  { get; set; }
 
-        public bool isLab { get; set; }
-
         // Navigation property: allows access and iteration through all the CoursePrereq
         // records associated with that group
-        public ICollection<CoursePrereq> CoursePrereqs { get; set; }
+        // public ICollection<CoursePrereq> CoursePrereqs { get; set; }
 
 
     }

@@ -59,13 +59,13 @@ namespace Student_Center_3._0_Database.Controllers
                 extraInformation = courseDTO.extraInformation,
                 prerequisites = courseDTO.prerequisites,
                 antirequisites = courseDTO.antirequisites,
+                courseWeight = courseDTO.courseWeight,
                 courseSemester = courseDTO.courseSemester,
                 courseTime = courseDTO.courseTime,
                 instructor = courseDTO.instructor,
                 room = courseDTO.room,  
                 numEnrolled = courseDTO.numEnrolled,
-                totalSeats = courseDTO.totalSeats,
-                isLab = courseDTO.isLab
+                totalSeats = courseDTO.totalSeats
             };
 
             if (id != course.courseNum)
@@ -110,13 +110,13 @@ namespace Student_Center_3._0_Database.Controllers
                     extraInformation = courseDTO.extraInformation,
                     prerequisites = courseDTO.prerequisites,
                     antirequisites = courseDTO.antirequisites,
+                    courseWeight = courseDTO.courseWeight,
                     courseSemester = courseDTO.courseSemester,
                     courseTime = courseDTO.courseTime,
                     instructor = courseDTO.instructor,
                     room = courseDTO.room,
                     numEnrolled = courseDTO.numEnrolled,
-                    totalSeats = courseDTO.totalSeats,
-                    isLab = courseDTO.isLab
+                    totalSeats = courseDTO.totalSeats
                 };
 
                 try

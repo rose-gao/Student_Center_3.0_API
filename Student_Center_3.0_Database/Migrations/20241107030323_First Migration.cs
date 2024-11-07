@@ -18,24 +18,22 @@ namespace Student_Center_3._0_Database.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     courseName = table.Column<string>(type: "nvarchar(60)", nullable: false),
                     courseSuffix = table.Column<string>(type: "nvarchar(3)", nullable: false),
-                    courseDesc = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
-                    extraInformation = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
+                    courseAlias = table.Column<string>(type: "nvarchar(60)", nullable: false),
+                    courseDesc = table.Column<string>(type: "nvarchar(MAX)", nullable: true),
+                    extraInformation = table.Column<string>(type: "nvarchar(MAX)", nullable: true),
                     prerequisites = table.Column<string>(type: "nvarchar(MAX)", nullable: true),
                     antirequisites = table.Column<string>(type: "nvarchar(MAX)", nullable: true),
-                    courseWeight = table.Column<int>(type: "int", nullable: false),
-                    courseSemester = table.Column<string>(type: "nvarchar(60)", nullable: false),
-                    courseDay = table.Column<string>(type: "nvarchar(60)", nullable: false),
-                    courseTime = table.Column<string>(type: "nvarchar(60)", nullable: false),
+                    courseWeight = table.Column<double>(type: "float", nullable: false),
+                    courseSemester = table.Column<string>(type: "nvarchar(100)", nullable: false),
+                    courseTime = table.Column<string>(type: "nvarchar(150)", nullable: false),
                     instructor = table.Column<string>(type: "nvarchar(60)", nullable: true),
                     room = table.Column<string>(type: "nvarchar(60)", nullable: true),
                     numEnrolled = table.Column<int>(type: "int", nullable: false),
-                    totalSeats = table.Column<int>(type: "int", nullable: false),
-                    isLab = table.Column<bool>(type: "bit", nullable: false)
+                    totalSeats = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Courses", x => x.courseNum);
-                    table.UniqueConstraint("AK_Courses_courseName", x => x.courseName);
                 });
 
             migrationBuilder.CreateTable(
@@ -80,20 +78,19 @@ namespace Student_Center_3._0_Database.Migrations
                 name: "CoursePrereqs",
                 columns: table => new
                 {
-                    courseName = table.Column<string>(type: "nvarchar(60)", nullable: false),
+                    courseName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     prerequisite = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     groupId = table.Column<int>(type: "int", nullable: false),
-                    course = table.Column<int>(type: "int", nullable: false)
+                    courseNum = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CoursePrereqs", x => new { x.courseName, x.prerequisite });
                     table.ForeignKey(
-                        name: "FK_CoursePrereqs_Courses_courseName",
-                        column: x => x.courseName,
+                        name: "FK_CoursePrereqs_Courses_courseNum",
+                        column: x => x.courseNum,
                         principalTable: "Courses",
-                        principalColumn: "courseName",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "courseNum");
                     table.ForeignKey(
                         name: "FK_CoursePrereqs_PrereqGroups_groupId",
                         column: x => x.groupId,
@@ -120,6 +117,11 @@ namespace Student_Center_3._0_Database.Migrations
                         principalColumn: "userNum",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CoursePrereqs_courseNum",
+                table: "CoursePrereqs",
+                column: "courseNum");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CoursePrereqs_groupId",
