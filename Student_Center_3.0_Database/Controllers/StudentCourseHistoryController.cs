@@ -11,24 +11,24 @@ namespace Student_Center_3._0_Database.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StudentCourseHistoriesController : ControllerBase
+    public class StudentCourseHistoryController : ControllerBase
     {
         private readonly StudentCenterContext _context;
 
-        public StudentCourseHistoriesController(StudentCenterContext context)
+        public StudentCourseHistoryController(StudentCenterContext context)
         {
             _context = context;
         }
 
-        // GET: api/StudentCourseHistories
+        // GET: api/StudentCourseHistory
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentCourseHistory>>> GetStudentCourseHistories()
         {
             return await _context.StudentCourseHistories.ToListAsync();
         }
 
-        // GET: api/StudentCourseHistories/5
-        [HttpGet("{userNum}")]
+        // GET: api/StudentCourseHistory/5
+        [HttpGet("{userNum}/{course}")]
         public async Task<ActionResult<StudentCourseHistory>> GetStudentCourseHistory(int userNum, string course)
         {
             var studentCourseHistory = await _context.StudentCourseHistories.SingleOrDefaultAsync(sch => sch.userNum == userNum && sch.course == course);
@@ -42,9 +42,27 @@ namespace Student_Center_3._0_Database.Controllers
             return studentCourseHistory;
         }
 
-        // PUT: api/StudentCourseHistories/5
+        // GET: api/StudentCourseHistory/user/{userId}
+        [HttpGet("user/{userNum}")]
+        public async Task<ActionResult<IEnumerable<string>>> GetCoursesByUser(int userNum)
+        {
+            var courses = await _context.StudentCourseHistories
+                .Where(sch => sch.userNum == userNum)
+                .Select(sch => sch.course)
+                .ToListAsync();
+
+            if (courses == null || !courses.Any())
+            {
+                return NotFound();
+            }
+
+            return courses;
+
+        }
+
+        // PUT: api/StudentCourseHistory/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{userNum}")]
+        [HttpPut("{userNum}/{course}")]
         public async Task<IActionResult> PutStudentCourseHistory(int userNum, string course, StudentCourseHistory studentCourseHistory)
         {
             if (userNum != studentCourseHistory.userNum || course != studentCourseHistory.course)
@@ -73,7 +91,7 @@ namespace Student_Center_3._0_Database.Controllers
             return NoContent();
         }
 
-        // POST: api/StudentCourseHistories
+        // POST: api/StudentCourseHistory
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<StudentCourseHistory>> PostStudentCourseHistory(StudentCourseHistory studentCourseHistory)
@@ -98,8 +116,8 @@ namespace Student_Center_3._0_Database.Controllers
             return CreatedAtAction("GetStudentCourseHistory", new { id = studentCourseHistory.userNum }, studentCourseHistory);
         }
 
-        // DELETE: api/StudentCourseHistories/5
-        [HttpDelete("{userNum}")]
+        // DELETE: api/StudentCourseHistory/5
+        [HttpDelete("{userNum}/{course}")]
         public async Task<IActionResult> DeleteStudentCourseHistory(int userNum, string course)
         {
             var studentCourseHistory = await _context.StudentCourseHistories.SingleOrDefaultAsync(sch => sch.userNum == userNum && sch.course == course);
