@@ -14,6 +14,10 @@ namespace Student_Center_3._0_Database.Models
         [Column(Order = 1)]
         public string course {  get; set; }
 
+        // track courseWeight in this table for historical accuracy
+        // (e.g., changes in course offerings removing courses from Courses table, changes in courseWeights)
+        public double courseWeight { get; set; }
+
 
     }
 }

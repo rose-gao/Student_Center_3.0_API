@@ -20,6 +20,11 @@ builder.Services.AddHttpClient<UserService>(client =>
     client.BaseAddress = new Uri("https://localhost:7176");
 });
 
+builder.Services.AddHttpClient<CourseService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7176");
+});
+
 
 
 var app = builder.Build();

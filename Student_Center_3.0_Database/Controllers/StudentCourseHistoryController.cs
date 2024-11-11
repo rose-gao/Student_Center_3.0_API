@@ -42,23 +42,22 @@ namespace Student_Center_3._0_Database.Controllers
             return studentCourseHistory;
         }
 
-        // GET: api/StudentCourseHistory/user/{userId}
+        // GET: api/StudentCourseHistory/user/{userNum}
         [HttpGet("user/{userNum}")]
-        public async Task<ActionResult<IEnumerable<string>>> GetCoursesByUser(int userNum)
+        public async Task<ActionResult<Dictionary<string, double>>> GetCoursesWithWeightsByUser(int userNum)
         {
-            var courses = await _context.StudentCourseHistories
+            var courseWeights = await _context.StudentCourseHistories
                 .Where(sch => sch.userNum == userNum)
-                .Select(sch => sch.course)
-                .ToListAsync();
+                .ToDictionaryAsync(sch => sch.course, sch => sch.courseWeight);
 
-            if (courses == null || !courses.Any())
+            if (courseWeights == null || !courseWeights.Any())
             {
                 return NotFound();
             }
 
-            return courses;
-
+            return courseWeights;
         }
+
 
         // PUT: api/StudentCourseHistory/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -92,7 +91,6 @@ namespace Student_Center_3._0_Database.Controllers
         }
 
         // POST: api/StudentCourseHistory
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<StudentCourseHistory>> PostStudentCourseHistory(StudentCourseHistory studentCourseHistory)
         {
