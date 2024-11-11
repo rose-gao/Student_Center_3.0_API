@@ -1,4 +1,5 @@
 # Western University Student Center v3.0 - Backend
+## [Front-End Repository](https://github.com/AndrewPitblado/Student_Center_3.0)
 ## Problem statement
 As of October 2024, Western University has a total of 36,205 students who must all use the Student Center to track and handle changes relating to their academics and finances (Western University, 2024). Clearly, the Student Center is a cornerstone of university life, making a good user experience (UX) exceedingly important. Following that logic, the Student Center was given a vast overhaul in late 2022, with the goal of improving mobile UX and allowing students to “access what they need in 3 clicks or less” (Western University, 2022). 
 Unfortunately, among the student population, it is not an uncommon opinion that the new Student Center is generally worse than the previous one. Though mobile UX is out of the project scope, this project will address three common device-agnostic frustrations:
