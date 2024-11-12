@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Student_Center_3._0_Services.DTOs;
 
@@ -18,7 +19,7 @@ namespace Student_Center_3._0_Services.Services
             _httpClient = httpClient;
         }
 
-        public async Task<bool> CheckPrerequisite(int userNum, string requestedCourse)
+        public async Task<bool> VerifyEnrollmentRequirements(int userNum, string requestedCourse)
         {
             // FETCH COURSE PREREQUISITES
             // Fetch prerequisite expression for the requested course
@@ -45,9 +46,34 @@ namespace Student_Center_3._0_Services.Services
             // Deserialize course history as Dictionary<string, double>
             var courseHistory = await historyResponse.Content.ReadFromJsonAsync<Dictionary<string, double>>();
 
-            // CHECK PREREQUISITE FULFILLMENT
-            return PrereqFulfilled(prereq.prerequisiteExpression, courseHistory);
+            // FETCH COURSE ANTIREQUISITES
+            var antireqResponse = await _httpClient.GetAsync($"api/CourseAntirequisite/course/{requestedCourse}");
+
+            // no antirequisites, simply check only prereqs
+            if (!antireqResponse.IsSuccessStatusCode)
+            {
+                return PrereqFulfilled(prereq.prerequisiteExpression, courseHistory);
+            }
+
+            var antireq = await antireqResponse.Content.ReadFromJsonAsync<List<string>>();
+
+            // CHECK PREREQUISITE FULFILLMENT AND ENSURE STUDENT HAS NOT ANTIREQUISITES
+            return PrereqFulfilled(prereq.prerequisiteExpression, courseHistory) && AntireqFulfilled(antireq, courseHistory);
         }
+
+
+        // HELPER: see if student has taken any antirequisites that make them ineligible for the requested course
+        private bool AntireqFulfilled(List<string> antirequisite,  Dictionary<string, double> courseHistory)
+        {
+            foreach (var anti in antirequisite)
+            {
+                if (courseHistory.ContainsKey(anti)){
+                    return false;
+                }
+            }
+            return true;
+        } 
+
 
         /* HELPER: uses a modified "postfix expression" evaluator algo to check if a student has fulfilled required prerequisites
          * ex. Course A prereqs: (AND: Course B, Course C, Course D) OR (CREDITS 1.0 FROM: Course E, Course F, Course G)

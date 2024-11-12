@@ -16,12 +16,12 @@ namespace Student_Center_3._0_Services.Controllers
             _courseService = courseService;
         }
 
-        // GET: api/Course/checkPrerequisite/{userNum}/{requestedCourse}
-        [HttpGet("checkPrerequisite/{userNum}/{requestedCourse}")]
-        public async Task<ActionResult<bool>> CheckPrerequisite(int userNum, string requestedCourse)
+        // GET: api/Course/VerifyEnrollmentRequirements/{userNum}/{requestedCourse}
+        [HttpGet("VerifyEnrollmentRequirements/{userNum}/{requestedCourse}")]
+        public async Task<ActionResult<bool>> VerifyEnrollmentRequirements(int userNum, string requestedCourse)
         {
             // Call the CheckPrerequisite method from CourseService
-            bool result = await _courseService.CheckPrerequisite(userNum, requestedCourse);
+            bool result = await _courseService.VerifyEnrollmentRequirements(userNum, requestedCourse);
 
             // Return the result as a response
             if (result)

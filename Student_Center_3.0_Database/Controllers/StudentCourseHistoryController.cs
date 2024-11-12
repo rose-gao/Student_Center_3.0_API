@@ -111,7 +111,9 @@ namespace Student_Center_3._0_Database.Controllers
                 }
             }
 
-            return CreatedAtAction("GetStudentCourseHistory", new { id = studentCourseHistory.userNum }, studentCourseHistory);
+            return CreatedAtAction("GetStudentCourseHistory",
+                new { userNum = studentCourseHistory.userNum, course = studentCourseHistory.course }, 
+                studentCourseHistory);
         }
 
         // DELETE: api/StudentCourseHistory/5
