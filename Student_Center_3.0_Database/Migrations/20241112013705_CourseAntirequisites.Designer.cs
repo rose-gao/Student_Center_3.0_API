@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Student_Center_3._0_Database.Models;
 
@@ -10,9 +11,11 @@ using Student_Center_3._0_Database.Models;
 namespace Student_Center_3._0_Database.Migrations
 {
     [DbContext(typeof(StudentCenterContext))]
-    partial class StudentCenterContextModelSnapshot : ModelSnapshot
+    [Migration("20241112013705_CourseAntirequisites")]
+    partial class CourseAntirequisites
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,7 +96,7 @@ namespace Student_Center_3._0_Database.Migrations
 
                     b.HasKey("course", "antirequisite");
 
-                    b.ToTable("CourseAntirequisites");
+                    b.ToTable("CourseAntirequisite");
                 });
 
             modelBuilder.Entity("Student_Center_3._0_Database.Models.CoursePrerequisite", b =>

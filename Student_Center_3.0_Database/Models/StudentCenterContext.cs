@@ -12,6 +12,7 @@ namespace Student_Center_3._0_Database.Models
         public DbSet<Login> Logins { get; set; }
         public DbSet<Course> Courses { get; set; }  
         public DbSet<CoursePrerequisite> CoursePrerequisites { get; set; }
+        public DbSet<CourseAntirequisite> CourseAntirequisites { get; set; }
         public DbSet<StudentCourseHistory> StudentCourseHistories { get; set; }
 
 
@@ -36,6 +37,9 @@ namespace Student_Center_3._0_Database.Models
                 .HasForeignKey(sch => sch.userNum) // Define userNum as the foreign key
                 .OnDelete(DeleteBehavior.Cascade); // Specify cascade delete if a user is removed
 
+            // initialize composite key for CourseAntirequisites
+            modelBuilder.Entity<CourseAntirequisite>()
+                .HasKey(ca => new { ca.course, ca.antirequisite });
         }
     }
 }
