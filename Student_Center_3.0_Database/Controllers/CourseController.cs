@@ -162,7 +162,7 @@ namespace Student_Center_3._0_Database.Controllers
             }
 
             // Try to parse query as a course number
-            bool isNumeric = int.TryParse(query, out int courseNumSearch);
+            //bool isNumeric = int.TryParse(query, out int courseNumSearch);
 
             // Convert query to lowercase for case-insensitive search
             query = query.ToLower();
@@ -171,9 +171,9 @@ namespace Student_Center_3._0_Database.Controllers
             var filteredCourses = await _context.Courses
                 .Where(course =>
                     // Case-insensitive search by converting courseName to lowercase, concatenate courseName and courseSuffix for searches like "1026B"
-                    (course.courseName.ToLower() + course.courseSuffix.ToLower()).Contains(query) ||
+                    (course.courseName.ToLower() + course.courseSuffix.ToLower()).Contains(query))
                     // Check if courseNum matches when query is numeric
-                    (isNumeric && course.courseNum == courseNumSearch))
+                    // || (isNumeric && course.courseNum == courseNumSearch))
                 // Group by courseName and courseNum to ensure distinct results
                 .GroupBy(course => new { course.courseName, course.courseNum })
                 .Select(g => g.First())  // Select only one instance per group
