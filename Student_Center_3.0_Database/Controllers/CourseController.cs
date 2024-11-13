@@ -52,18 +52,18 @@ namespace Student_Center_3._0_Database.Controllers
             var course = new Course
             {
                 courseNum = id,
-                courseName = courseDTO.courseName,
-                courseSuffix = courseDTO.courseSuffix,
-                courseAlias = courseDTO.courseAlias,
+                courseName = courseDTO.courseName.Trim(),
+                courseSuffix = courseDTO.courseSuffix.Trim(),
+                courseAlias = courseDTO.courseAlias.Trim(),
                 courseDesc = courseDTO.courseDesc,
-                extraInformation = courseDTO.extraInformation,
-                prerequisites = courseDTO.prerequisites,
-                antirequisites = courseDTO.antirequisites,
+                extraInformation = courseDTO.extraInformation?.Trim() ?? string.Empty,
+                prerequisites = courseDTO.prerequisites?.Trim() ?? string.Empty,
+                antirequisites = courseDTO.antirequisites?.Trim() ?? string.Empty,
                 courseWeight = courseDTO.courseWeight,
-                courseSemester = courseDTO.courseSemester,
-                courseTime = courseDTO.courseTime,
-                instructor = courseDTO.instructor,
-                room = courseDTO.room,  
+                courseSemester = courseDTO.courseSemester.Trim(),
+                courseTime = courseDTO.courseTime.Trim(),
+                instructor = courseDTO.instructor?.Trim() ?? string.Empty,
+                room = courseDTO.room?.Trim() ?? string.Empty,
                 numEnrolled = courseDTO.numEnrolled,
                 totalSeats = courseDTO.totalSeats
             };
@@ -103,18 +103,18 @@ namespace Student_Center_3._0_Database.Controllers
             {
                 var course = new Course
                 {
-                    courseName = courseDTO.courseName,
-                    courseSuffix = courseDTO.courseSuffix,
-                    courseAlias = courseDTO.courseAlias,
+                    courseName = courseDTO.courseName.Trim(),
+                    courseSuffix = courseDTO.courseSuffix.Trim(),
+                    courseAlias = courseDTO.courseAlias.Trim(),
                     courseDesc = courseDTO.courseDesc,
-                    extraInformation = courseDTO.extraInformation,
-                    prerequisites = courseDTO.prerequisites,
-                    antirequisites = courseDTO.antirequisites,
+                    extraInformation = courseDTO.extraInformation?.Trim() ?? string.Empty,
+                    prerequisites = courseDTO.prerequisites?.Trim() ?? string.Empty,
+                    antirequisites = courseDTO.antirequisites?.Trim() ?? string.Empty,
                     courseWeight = courseDTO.courseWeight,
-                    courseSemester = courseDTO.courseSemester,
-                    courseTime = courseDTO.courseTime,
-                    instructor = courseDTO.instructor,
-                    room = courseDTO.room,
+                    courseSemester = courseDTO.courseSemester.Trim(),
+                    courseTime = courseDTO.courseTime.Trim(),
+                    instructor = courseDTO.instructor?.Trim() ?? string.Empty,
+                    room = courseDTO.room?.Trim() ?? string.Empty,
                     numEnrolled = courseDTO.numEnrolled,
                     totalSeats = courseDTO.totalSeats
                 };
@@ -151,6 +151,38 @@ namespace Student_Center_3._0_Database.Controllers
 
             return NoContent();
         }
+
+        // GET: api/Course/search?query={searchString}
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Course>>> SearchCourses(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("Query string cannot be empty.");
+            }
+
+            // Try to parse query as a course number
+            bool isNumeric = int.TryParse(query, out int courseNumSearch);
+
+            // Convert query to lowercase for case-insensitive search
+            query = query.ToLower();
+
+            // Filter courses based on the query and group by courseName and courseNum to remove duplicates
+            var filteredCourses = await _context.Courses
+                .Where(course =>
+                    // Case-insensitive search by converting courseName to lowercase, concatenate courseName and courseSuffix for searches like "1026B"
+                    (course.courseName.ToLower() + course.courseSuffix.ToLower()).Contains(query) ||
+                    // Check if courseNum matches when query is numeric
+                    (isNumeric && course.courseNum == courseNumSearch))
+                // Group by courseName and courseNum to ensure distinct results
+                .GroupBy(course => new { course.courseName, course.courseNum })
+                .Select(g => g.First())  // Select only one instance per group
+                .ToListAsync();
+
+            return Ok(filteredCourses);
+        }
+
+
 
         private bool CourseExists(int id)
         {

@@ -6,33 +6,33 @@ namespace Student_Center_3._0_Services.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CourseController : ControllerBase
+    public class CourseServiceController : ControllerBase
     {
         private readonly CourseService _courseService;
 
         // Constructor that accepts the CourseService
-        public CourseController(CourseService courseService)
+        public CourseServiceController(CourseService courseService)
         {
             _courseService = courseService;
         }
 
-        // GET: api/Course/VerifyEnrollmentRequirements/{userNum}/{requestedCourse}
-        [HttpGet("VerifyEnrollmentRequirements/{userNum}/{requestedCourse}")]
-        public async Task<ActionResult<bool>> VerifyEnrollmentRequirements(int userNum, string requestedCourse)
+        // GET: api/Course/GetCoursesBySearch/search?query={searchString}
+        [HttpGet("search")]
+        public async Task<ActionResult<List<Dictionary<string, object>>>> GetCoursesBySearch(string query)
         {
-            // Call the CheckPrerequisite method from CourseService
-            bool result = await _courseService.VerifyEnrollmentRequirements(userNum, requestedCourse);
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("Query string cannot be empty.");
+            }
 
-            // Return the result as a response
-            if (result)
+            var courses = await _courseService.GetCoursesLabsBySearch(query);
+
+            if (courses == null || !courses.Any())
             {
-                return Ok(true); // If prerequisites are fulfilled, return true
+                return NotFound("No matching courses found.");
             }
-            else
-            {
-                return BadRequest("Prerequisite not fulfilled or no course history found.");
-            }
+
+            return Ok(courses);
         }
     }
-
 }
