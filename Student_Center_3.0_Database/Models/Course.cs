@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using Student_Center_3._0_Database.Utils;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 // course : lab relation -- when adding a lab, must input courseNum; then add courseNum : labNum to database table
@@ -35,8 +37,13 @@ namespace Student_Center_3._0_Database.Models
 
         public double courseWeight { get; set; }
 
-        [Column(TypeName = "nvarchar(100)")]
-        public string courseSemester { get; set; }
+        [JsonProperty("startDate")]
+        [JsonConverter(typeof(CustomDateTimeConverterUtils))]
+        public DateTime startDate { get; set; }
+
+        [JsonProperty("endDate")]
+        [JsonConverter(typeof(CustomDateTimeConverterUtils))]
+        public DateTime endDate { get; set; }
 
         [Column(TypeName = "nvarchar(150)")]
         public string courseTime { get; set; }

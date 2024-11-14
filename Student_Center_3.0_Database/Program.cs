@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Student_Center_3._0_Database.Models;
+using Student_Center_3._0_Database.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<StudentCenterContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new CustomDateTimeConverterUtils());
+    });
 
 /*
 //temp.GenerateKeyAndIV();
