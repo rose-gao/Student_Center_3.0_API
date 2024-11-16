@@ -19,16 +19,8 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new CustomDateTimeConverterUtils());
     });
 
-/*
-//temp.GenerateKeyAndIV();
-
-// Allows services to be registered in controllers
-builder.Services.AddControllersWithViews();
-
-// Register a Singleton service (only one instance for the application lifetime),
-// service is an instance of IConiguration, which holds all key-value pairs from appsettings.json
-builder.Services.AddSingleton(builder.Configuration);
-*/
+// Add configuration settings to the container.
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);  // Make IConfiguration available to make configuration settings available to all applications.
 
 var app = builder.Build();
 
@@ -38,11 +30,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
+
 }
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseRouting();
 
 app.MapControllers();
 

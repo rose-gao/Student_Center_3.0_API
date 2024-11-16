@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using Student_Center_3._0_Database.DTOs;
@@ -17,11 +19,14 @@ namespace Student_Center_3._0_Database.Controllers
     public class CourseController : ControllerBase
     {
         private readonly StudentCenterContext _context;
+        private readonly IConfiguration _configuration;
 
-        public CourseController(StudentCenterContext context)
+        public CourseController(StudentCenterContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
+
 
         // GET: api/Course
         [HttpGet]
@@ -152,6 +157,7 @@ namespace Student_Center_3._0_Database.Controllers
             return NoContent();
         }
 
+        /*
         // GET: api/Course/search?query={searchString}
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Course>>> SearchCourses(string query)
@@ -180,6 +186,39 @@ namespace Student_Center_3._0_Database.Controllers
                 .ToListAsync();
 
             return Ok(filteredCourses);
+        }
+        */
+
+        [HttpPost("executeQuery")]
+        public async Task<IActionResult> ExecuteQuery([FromBody] string sqlQuery)
+        {
+            Console.WriteLine(sqlQuery);
+            if (string.IsNullOrWhiteSpace(sqlQuery))
+            {
+                return BadRequest("SQL query cannot be empty.");
+            }
+
+            // Optional: Basic validation to ensure it's a SELECT query
+            if (!sqlQuery.Trim().StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest("Only SELECT queries are allowed.");
+            }
+
+            try
+            {
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DevConnection")))
+                {
+                    await connection.OpenAsync();
+
+                    // Using Dapper to execute the query and return results
+                    var results = await connection.QueryAsync(sqlQuery);
+                    return Ok(results);
+                }
+            }
+            catch (SqlException ex)
+            {
+                return StatusCode(500, $"Error executing query: {ex.Message}");
+            }
         }
 
 
