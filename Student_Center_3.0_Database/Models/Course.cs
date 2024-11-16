@@ -45,9 +45,6 @@ namespace Student_Center_3._0_Database.Models
         [JsonConverter(typeof(CustomDateTimeConverterUtils))]
         public DateTime endDate { get; set; }
 
-        [Column(TypeName = "nvarchar(150)")]
-        public string courseTime { get; set; }
-
         [Column(TypeName = "nvarchar(60)")]
         public string? instructor { get; set; }
 
