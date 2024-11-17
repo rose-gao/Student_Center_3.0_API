@@ -23,12 +23,31 @@ namespace Student_Center_3._0_Services.Services
 
         public async Task<string> AddCourse(int userNum, int courseNum)
         {
-            // HAS STUDENT ALREADY ENROLLED IN THIS COURSE?
-            var dupEnrollmentResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/{userNum}/{courseNum}");
+            // Fetch list of the student's currently enrolled courses, track total number of planned credits
+            var creditResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/user/{userNum}");
+            double totalCredits = 0;
+            List<StudentCourseEnrollmentDTO> enrolledCourses = new List<StudentCourseEnrollmentDTO>();
 
-            if (dupEnrollmentResponse.IsSuccessStatusCode)
+
+            if (creditResponse.IsSuccessStatusCode)
             {
-                return "Duplicate Enrollment";
+                // Deserialize the response into a list of StudentCourseEnrollment
+                enrolledCourses = await creditResponse.Content.ReadFromJsonAsync<List<StudentCourseEnrollmentDTO>>();
+
+                if (enrolledCourses.Any())
+                {
+                    // Sum the course weights
+                    totalCredits = enrolledCourses.Sum(crs => crs.courseWeight);
+
+                    // HAS STUDENT ALREADY ENROLLED IN THIS COURSE?
+                    bool courseExists = enrolledCourses.Any(course => course.courseNum == courseNum);
+                    if (courseExists)
+                    {
+                        return "Duplicate Enrollment";
+                    }
+
+                }
+
             }
 
             // IS COURSE FULL?
@@ -52,24 +71,6 @@ namespace Student_Center_3._0_Services.Services
             }
 
             // DOES ADDING COURSE EXCEED 5.0 CREDITS/YEAR LIMIT?
-            var creditResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/user/{userNum}");
-            double totalCredits = 0;
-            List<StudentCourseEnrollmentDTO> enrolledCourses = new List<StudentCourseEnrollmentDTO>();
-
-
-            if (creditResponse.IsSuccessStatusCode)
-            {
-                // Deserialize the response into a list of StudentCourseEnrollment
-                enrolledCourses = await creditResponse.Content.ReadFromJsonAsync<List<StudentCourseEnrollmentDTO>>();
-
-                if (enrolledCourses.Any())
-                {
-                    // Sum the course weights
-                    totalCredits = enrolledCourses.Sum(crs => crs.courseWeight);
-                }
-                
-            }
-
             totalCredits += courseRecord.courseWeight;
 
             // Check if the total credits exceed 5.0
@@ -96,8 +97,6 @@ namespace Student_Center_3._0_Services.Services
             var content = new StringContent(courseRecord.numEnrolled.ToString(), Encoding.UTF8, "application/json");
 
             var updateCourseResponse = await _httpClient.PatchAsync($"api/Course/{courseNum}/update-enrollment", content);
-            Console.WriteLine(updateCourseResponse);
-            Console.WriteLine(updateCourseResponse.Content);
 
             if (updateCourseResponse.IsSuccessStatusCode)
             {
@@ -112,9 +111,6 @@ namespace Student_Center_3._0_Services.Services
                     endDate = courseRecord.endDate.ToString("yyyy-MM-dd"),
                     courseWeight = courseRecord.courseWeight
                 };
-
-
-                Console.ReadKey();
 
                 var enrollmentResponse = await _httpClient.PostAsJsonAsync("api/StudentCourseEnrollment", newEnrollment);
 
