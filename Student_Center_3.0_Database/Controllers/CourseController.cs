@@ -221,6 +221,33 @@ namespace Student_Center_3._0_Database.Controllers
             }
         }
 
+        [HttpPatch("{courseNum}/update-enrollment")]
+        public async Task<IActionResult> UpdateCourseEnrollment(int courseNum, [FromBody] int updatedNumEnrolled)
+        {
+            // Find the course by its courseNum
+            var course = await _context.Courses.FindAsync(courseNum);
+
+            if (course == null)
+            {
+                return NotFound($"Course with courseNum {courseNum} not found.");
+            }
+
+            // Update the numEnrolled column
+            course.numEnrolled = updatedNumEnrolled;
+
+            try
+            {
+                // Save the changes to the database
+                await _context.SaveChangesAsync();
+                return Ok($"numEnrolled for course {courseNum} updated to {updatedNumEnrolled}.");
+            }
+            catch (Exception ex)
+            {
+                // Handle potential errors
+                return StatusCode(500, $"An error occurred while updating the course: {ex.Message}");
+            }
+        }
+
 
 
         private bool CourseExists(int id)

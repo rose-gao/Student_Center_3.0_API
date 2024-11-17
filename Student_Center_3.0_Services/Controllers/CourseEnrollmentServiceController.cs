@@ -30,6 +30,24 @@ namespace Student_Center_3._0_Services.Controllers
             }
             return BadRequest("Prerequisite not fulfilled or no course history found.");
         }
+
+        // Post: api/CourseEnrollmentService/AddCourse/{userNum}/{courseNum}
+        [HttpPost("AddCourse/{userNum}/{courseNum}")]
+        public async Task<ActionResult<string>> AddCourse(int userNum, int courseNum)
+        {
+            // Call the AddCourse method from CourseEnrollmentService
+            string result = await _courseEnrollmentService.AddCourse(userNum, courseNum);
+
+            // Return the result as a response
+            if (result == "OK")
+            {
+                return Ok("Course successfully added."); // Success response with a message
+            }
+
+            // Return error message from the service
+            return BadRequest($"Failed to add course: {result}");
+        }
+
     }
 
 }

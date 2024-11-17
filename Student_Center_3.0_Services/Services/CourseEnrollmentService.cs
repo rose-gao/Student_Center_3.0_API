@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Student_Center_3._0_Database.DTOs;
 using Student_Center_3._0_Services.DTOs;
 
 namespace Student_Center_3._0_Services.Services
@@ -17,6 +19,124 @@ namespace Student_Center_3._0_Services.Services
         public CourseEnrollmentService(HttpClient httpClient)
         {
             _httpClient = httpClient;
+        }
+
+        public async Task<string> AddCourse(int userNum, int courseNum)
+        {
+            // HAS STUDENT ALREADY ENROLLED IN THIS COURSE?
+            var dupEnrollmentResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/{userNum}/{courseNum}");
+
+            if (dupEnrollmentResponse.IsSuccessStatusCode)
+            {
+                return "Duplicate Enrollment";
+            }
+
+            // IS COURSE FULL?
+            var courseResponse = await _httpClient.GetAsync($"api/Course/{courseNum}");
+            Console.WriteLine(courseResponse);
+            Console.WriteLine(courseResponse.Content);
+
+            if (!courseResponse.IsSuccessStatusCode)
+            {
+                return "Course Not Found";
+            }
+
+            var courseRecord = await courseResponse.Content.ReadFromJsonAsync<CourseDTO>();
+            Console.WriteLine(courseRecord);
+            Console.ReadKey();
+
+            if (courseRecord == null)
+            {
+                return "Course Not Found";
+            }
+
+            if (courseRecord.numEnrolled == courseRecord.totalSeats)
+            {
+                return "Course full";
+            }
+
+            // DOES ADDING COURSE EXCEED 5.0 CREDITS/YEAR LIMIT?
+            var creditResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/user/{userNum}");
+
+            double totalCredits = 0;
+            List<StudentCourseEnrollmentDTO> enrolledCourses = new List<StudentCourseEnrollmentDTO>();
+
+            if (creditResponse.IsSuccessStatusCode)
+            {
+                // Deserialize the response into a list of StudentCourseEnrollment
+                enrolledCourses = await creditResponse.Content.ReadFromJsonAsync<List<StudentCourseEnrollmentDTO>>();
+
+                if (enrolledCourses.Any())
+                {
+                    // Sum the course weights
+                    totalCredits = enrolledCourses.Sum(crs => crs.courseWeight);
+                }
+                
+            }
+
+            totalCredits += courseRecord.courseWeight;
+
+            // Check if the total credits exceed 5.0
+            if (totalCredits > 5.0)
+            {
+                return "Exceeds credit limit";
+            }
+       
+
+            // DOES COURSE'S CLASS TIMES CONFLICT WITH STUDENT'S CURRENTLY ENROLLED CLASSES?
+            if (!await VerifyNoConflicts(userNum, enrolledCourses))
+            {
+                return "Time conflict";
+            }
+
+            // DOES STUDENT FULFILL PREREQUISITES?
+            if (!await VerifyEnrollmentRequirements(userNum, courseRecord.courseName))
+            {
+                return "Lacking prerequisites or having antirequisites";
+            }
+
+            // INCREMENT NUMBER OF ENROLLED STUDENTS IN THE COURSE
+            courseRecord.numEnrolled += 1;
+            var content = new StringContent(courseRecord.numEnrolled.ToString(), Encoding.UTF8, "application/json");
+
+            var updateCourseResponse = await _httpClient.PatchAsync($"api/Course/{courseNum}/update-enrollment", content);
+
+            if (updateCourseResponse.IsSuccessStatusCode)
+            {
+                // ADD COURSE TO STUDENT'S RECORD
+                var newEnrollment = new StudentCourseEnrollmentDTO
+                {
+                    userNum = userNum,
+                    courseNum = courseNum,
+                    courseName = courseRecord.courseName,
+                    courseSuffix = courseRecord.courseSuffix,
+                    courseWeight = courseRecord.courseWeight
+                };
+
+                var enrollmentResponse = await _httpClient.PostAsJsonAsync("api/StudentCourseEnrollment", newEnrollment);
+
+                if (enrollmentResponse.IsSuccessStatusCode)
+                {
+                    return "OK";
+                }
+                else
+                {
+                    var errorContent = await enrollmentResponse.Content.ReadAsStringAsync();
+                    return $"{errorContent}";
+                }
+            }
+
+            else
+            {
+                var errorContent = await updateCourseResponse.Content.ReadAsStringAsync();
+                return $"{errorContent}";
+            }
+
+        }
+
+        public async Task<bool> VerifyNoConflicts(int userNum, List<StudentCourseEnrollmentDTO> studentCourseEnrollment)
+        {
+            return true;
         }
 
         public async Task<bool> VerifyEnrollmentRequirements(int userNum, string requestedCourse)
@@ -56,6 +176,9 @@ namespace Student_Center_3._0_Services.Services
             }
 
             var antireq = await antireqResponse.Content.ReadFromJsonAsync<List<string>>();
+
+            // if student has already taken this course, they can't take it again
+            antireq.Add(requestedCourse);
 
             // CHECK PREREQUISITE FULFILLMENT AND ENSURE STUDENT HAS NOT ANTIREQUISITES
             return PrereqFulfilled(prereq.prerequisiteExpression, courseHistory) && AntireqFulfilled(antireq, courseHistory);

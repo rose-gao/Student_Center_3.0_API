@@ -45,11 +45,11 @@ namespace Student_Center_3._0_Database.Controllers
 
         // GET: api/StudentCourseEnrollment/user/{userNum}
         [HttpGet("user/{userNum}")]
-        public async Task<ActionResult<List<int>>> GetCoursesByUser(int userNum)
+        public async Task<ActionResult<List<StudentCourseEnrollment>>> GetCoursesByUser(int userNum)
         {
+            // Fetch all columns for the courses the user is enrolled in
             var enrolledCourses = await _context.StudentCourseEnrollments
                 .Where(sce => sce.userNum == userNum)
-                .Select(sce => sce.courseNum)
                 .ToListAsync();
 
             if (enrolledCourses == null || !enrolledCourses.Any())
@@ -59,6 +59,7 @@ namespace Student_Center_3._0_Database.Controllers
 
             return enrolledCourses;
         }
+
 
         // POST: api/StudentCourseEnrollment
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

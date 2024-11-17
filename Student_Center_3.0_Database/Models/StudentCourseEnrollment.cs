@@ -12,5 +12,15 @@ namespace Student_Center_3._0_Database.Models
         [Key, ForeignKey("Course")]
         [Column(Order = 1)]
         public int courseNum { get; set; }
+
+        // ex. Computer Science 1026
+        [Column(TypeName = "nvarchar(60)")]
+        public string courseName { get; set; }
+
+        // ex. "A" for Computer Science 1026A
+        [Column(TypeName = "nvarchar(3)")]
+        public string courseSuffix { get; set; }
+
+        public double courseWeight { get; set; }
     }
 }
