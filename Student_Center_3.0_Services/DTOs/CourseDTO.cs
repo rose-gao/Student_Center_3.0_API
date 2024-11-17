@@ -2,6 +2,7 @@
 {
     public class CourseDTO
     {
+        public int courseNum {  get; set; }
         public string courseName { get; set; }
         public string courseSuffix { get; set; }
         public string courseAlias { get; set; }

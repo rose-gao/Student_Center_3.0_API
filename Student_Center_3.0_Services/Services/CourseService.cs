@@ -106,8 +106,6 @@ public class CourseService
 
         foreach (var course in mainCourses)
         {
-            Console.WriteLine("course");
-
             // Identify matching lab components for each course by courseName and courseSuffix
             foreach (var lab in labs)
             {

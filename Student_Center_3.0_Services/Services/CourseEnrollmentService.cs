@@ -23,33 +23,6 @@ namespace Student_Center_3._0_Services.Services
 
         public async Task<string> AddCourse(int userNum, int courseNum)
         {
-            // Fetch list of the student's currently enrolled courses, track total number of planned credits
-            var creditResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/user/{userNum}");
-            double totalCredits = 0;
-            List<StudentCourseEnrollmentDTO> enrolledCourses = new List<StudentCourseEnrollmentDTO>();
-
-
-            if (creditResponse.IsSuccessStatusCode)
-            {
-                // Deserialize the response into a list of StudentCourseEnrollment
-                enrolledCourses = await creditResponse.Content.ReadFromJsonAsync<List<StudentCourseEnrollmentDTO>>();
-
-                if (enrolledCourses.Any())
-                {
-                    // Sum the course weights
-                    totalCredits = enrolledCourses.Sum(crs => crs.courseWeight);
-
-                    // HAS STUDENT ALREADY ENROLLED IN THIS COURSE?
-                    bool courseExists = enrolledCourses.Any(course => course.courseNum == courseNum);
-                    if (courseExists)
-                    {
-                        return "Duplicate Enrollment";
-                    }
-
-                }
-
-            }
-
             // IS COURSE FULL?
             var courseResponse = await _httpClient.GetAsync($"api/Course/{courseNum}");
 
@@ -70,6 +43,33 @@ namespace Student_Center_3._0_Services.Services
                 return "Course full";
             }
 
+            // Fetch list of the student's currently enrolled courses, track total number of planned credits
+            var creditResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/user/{userNum}");
+            double totalCredits = 0;
+            List<StudentCourseEnrollmentDTO> enrolledCourses = new List<StudentCourseEnrollmentDTO>();
+
+
+            if (creditResponse.IsSuccessStatusCode)
+            {
+                // Deserialize the response into a list of StudentCourseEnrollment
+                enrolledCourses = await creditResponse.Content.ReadFromJsonAsync<List<StudentCourseEnrollmentDTO>>();
+
+                if (enrolledCourses.Any())
+                {
+                    // Sum the course weights
+                    totalCredits = enrolledCourses.Sum(crs => crs.courseWeight);
+
+                    // HAS STUDENT ALREADY ENROLLED IN THIS COURSE?
+                    bool courseExists = enrolledCourses.Any(course => course.courseName == courseRecord.courseName);
+                    if (courseExists)
+                    {
+                        return "Duplicate Enrollment";
+                    }
+
+                }
+
+            }
+
             // DOES ADDING COURSE EXCEED 5.0 CREDITS/YEAR LIMIT?
             totalCredits += courseRecord.courseWeight;
 
@@ -81,7 +81,7 @@ namespace Student_Center_3._0_Services.Services
        
 
             // DOES COURSE'S CLASS TIMES CONFLICT WITH STUDENT'S CURRENTLY ENROLLED CLASSES?
-            if (!await VerifyNoConflicts(userNum, courseRecord, enrolledCourses))
+            if (!await VerifyNoConflicts(courseRecord, enrolledCourses))
             {
                 return "Time conflict";
             }
@@ -133,9 +133,132 @@ namespace Student_Center_3._0_Services.Services
 
         }
 
-        public async Task<bool> VerifyNoConflicts(int userNum, CourseDTO courseRecord, List<StudentCourseEnrollmentDTO> studentCourseEnrollment)
+        public async Task<bool> VerifyNoConflicts(CourseDTO courseRecord, List<StudentCourseEnrollmentDTO> studentCourseEnrollment)
         {
-            // Find 
+            // GET LIST OF CLASS TIMES FOR THE STUDENT'S ENROLLED COURSES
+            var classList = new List<int> { courseRecord.courseNum };
+
+            // Find list of courses that occur in the same semester(s) as the requested course
+            foreach (var enrollment in studentCourseEnrollment)
+            {
+                var crsStart = DateTime.Parse(enrollment.startDate);
+                var crsEnd = DateTime.Parse(enrollment.endDate);
+
+                if ((crsStart >= courseRecord.startDate & crsStart <= courseRecord.endDate) |
+                    (crsEnd >= courseRecord.startDate & crsEnd <= courseRecord.endDate))
+                {
+                    classList.Add(enrollment.courseNum);
+                }
+            }
+
+            var enrolledCourseTimes = new List<CourseTimeDTO>();
+
+            // Fetch class times from table (the first entry in classList is the requested course; if classList.Count == 1, the student is not currently enrolled in any other course) 
+            if (classList.Count > 1)
+            {
+                string courseNumList = string.Join(",", classList);
+                string query = $"SELECT * FROM CourseTimes WHERE courseNum IN ({courseNumList})";
+
+                var response = await _httpClient.PostAsJsonAsync("api/Course/executeQuery", query);
+
+                // No enrolled courses to fetch times for
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Error fetching course times: {errorContent}");
+                }
+
+                // Deserialize JSON response into a list of dictionaries for flexibility
+                enrolledCourseTimes = await response.Content.ReadFromJsonAsync<List<CourseTimeDTO>>();
+            }
+            // No enrolled courses that could conflict
+            else
+            {
+                return true;
+            }
+
+            return await CheckTimeOverlaps(courseRecord.courseNum, enrolledCourseTimes);
+        }
+
+        // HELPER: check student's current timetable and see if any time overlaps will occur if the requested course is added to the schedule.
+        private async Task<bool> CheckTimeOverlaps(int courseNum, List<CourseTimeDTO> enrolledCourseTimes) 
+        { 
+
+            // Process the data into the dictionary format
+            var courseSchedule = new Dictionary<int, List<List<TimeSpan>>>();
+            var courseToVerify = new Dictionary<int, List<List<TimeSpan>>>();
+
+            foreach (var courseTime in enrolledCourseTimes)
+            {
+                if (courseTime.courseNum == courseNum)
+                {
+                    if (!courseToVerify.ContainsKey(courseTime.weekday))
+                    {
+                        // If the weekday is not in the dictionary, add it with a new list
+                        courseToVerify[courseTime.weekday] = new List<List<TimeSpan>>();
+                    }
+
+                    // Add the course times as a nested list [startTime, endTime]
+                    courseToVerify[courseTime.weekday].Add(new List<TimeSpan> { TimeSpan.Parse(courseTime.startTime), TimeSpan.Parse(courseTime.endTime) });
+
+                    continue;
+
+                }
+
+                if (!courseSchedule.ContainsKey(courseTime.weekday))
+                {
+                    // If the weekday is not in the dictionary, add it with a new list
+                    courseSchedule[courseTime.weekday] = new List<List<TimeSpan>>();
+                }
+
+                // Add the course times as a nested list [startTime, endTime]
+                courseSchedule[courseTime.weekday].Add(new List<TimeSpan> { TimeSpan.Parse(courseTime.startTime), TimeSpan.Parse(courseTime.endTime)});
+            }
+
+            // Sort the class times for each weekday by startTime
+            foreach (var day in courseSchedule)
+            {
+                day.Value.Sort((time1, time2) =>
+                    time1[0].CompareTo(time2[0]));
+            }
+
+            // CHECK FOR ANY TIME-INTERVAL OVERLAPS
+            foreach (var day in courseToVerify)
+            {
+
+                // current schedule doesn't have any classes on the requested day
+                if (!courseSchedule.ContainsKey(day.Key))
+                {
+                    continue;
+                }
+
+                var classTimesForDay = courseSchedule[day.Key];
+
+                foreach (var reqTime in day.Value)
+                {
+                    foreach (var classTime in classTimesForDay)
+                    {
+                        // If the class time ends before the requested time starts, move onto next class time
+                        if (reqTime[0] >= classTime[1])
+                        {
+                            continue;
+                        }
+
+                        // If the class time starts after the requested time ends, break early
+                        if (reqTime[1] <= classTime[0])
+                        {
+                            break; 
+                        }
+
+                        // if requested time range overlaps with a class time, return False
+                        if (reqTime[0] <= classTime[0] || reqTime[1] >= classTime[1])
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
             return true;
         }
 
