@@ -1,4 +1,6 @@
-﻿namespace Student_Center_3._0_Database.DTOs
+﻿using System.Text.Json.Serialization;
+
+namespace Student_Center_3._0_Database.DTOs
 {
     public class StudentCourseEnrollmentDTO
     {
@@ -9,6 +11,10 @@
         public string courseName { get; set; }
 
         public string courseSuffix { get; set; }
+
+        public string startDate { get; set; }
+
+        public string endDate { get; set; }
 
         public double courseWeight { get; set; }
     }

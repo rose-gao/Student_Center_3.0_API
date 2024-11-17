@@ -33,8 +33,6 @@ namespace Student_Center_3._0_Services.Services
 
             // IS COURSE FULL?
             var courseResponse = await _httpClient.GetAsync($"api/Course/{courseNum}");
-            Console.WriteLine(courseResponse);
-            Console.WriteLine(courseResponse.Content);
 
             if (!courseResponse.IsSuccessStatusCode)
             {
@@ -42,8 +40,6 @@ namespace Student_Center_3._0_Services.Services
             }
 
             var courseRecord = await courseResponse.Content.ReadFromJsonAsync<CourseDTO>();
-            Console.WriteLine(courseRecord);
-            Console.ReadKey();
 
             if (courseRecord == null)
             {
@@ -57,9 +53,9 @@ namespace Student_Center_3._0_Services.Services
 
             // DOES ADDING COURSE EXCEED 5.0 CREDITS/YEAR LIMIT?
             var creditResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/user/{userNum}");
-
             double totalCredits = 0;
             List<StudentCourseEnrollmentDTO> enrolledCourses = new List<StudentCourseEnrollmentDTO>();
+
 
             if (creditResponse.IsSuccessStatusCode)
             {
@@ -84,7 +80,7 @@ namespace Student_Center_3._0_Services.Services
        
 
             // DOES COURSE'S CLASS TIMES CONFLICT WITH STUDENT'S CURRENTLY ENROLLED CLASSES?
-            if (!await VerifyNoConflicts(userNum, enrolledCourses))
+            if (!await VerifyNoConflicts(userNum, courseRecord, enrolledCourses))
             {
                 return "Time conflict";
             }
@@ -100,6 +96,8 @@ namespace Student_Center_3._0_Services.Services
             var content = new StringContent(courseRecord.numEnrolled.ToString(), Encoding.UTF8, "application/json");
 
             var updateCourseResponse = await _httpClient.PatchAsync($"api/Course/{courseNum}/update-enrollment", content);
+            Console.WriteLine(updateCourseResponse);
+            Console.WriteLine(updateCourseResponse.Content);
 
             if (updateCourseResponse.IsSuccessStatusCode)
             {
@@ -110,8 +108,13 @@ namespace Student_Center_3._0_Services.Services
                     courseNum = courseNum,
                     courseName = courseRecord.courseName,
                     courseSuffix = courseRecord.courseSuffix,
+                    startDate = courseRecord.startDate.ToString("yyyy-MM-dd"),
+                    endDate = courseRecord.endDate.ToString("yyyy-MM-dd"),
                     courseWeight = courseRecord.courseWeight
                 };
+
+
+                Console.ReadKey();
 
                 var enrollmentResponse = await _httpClient.PostAsJsonAsync("api/StudentCourseEnrollment", newEnrollment);
 
@@ -134,8 +137,9 @@ namespace Student_Center_3._0_Services.Services
 
         }
 
-        public async Task<bool> VerifyNoConflicts(int userNum, List<StudentCourseEnrollmentDTO> studentCourseEnrollment)
+        public async Task<bool> VerifyNoConflicts(int userNum, CourseDTO courseRecord, List<StudentCourseEnrollmentDTO> studentCourseEnrollment)
         {
+            // Find 
             return true;
         }
 

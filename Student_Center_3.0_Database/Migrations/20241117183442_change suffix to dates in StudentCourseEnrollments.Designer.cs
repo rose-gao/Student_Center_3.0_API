@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Student_Center_3._0_Database.Models;
 
@@ -11,9 +12,11 @@ using Student_Center_3._0_Database.Models;
 namespace Student_Center_3._0_Database.Migrations
 {
     [DbContext(typeof(StudentCenterContext))]
-    partial class StudentCenterContextModelSnapshot : ModelSnapshot
+    [Migration("20241117183442_change suffix to dates in StudentCourseEnrollments")]
+    partial class changesuffixtodatesinStudentCourseEnrollments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,10 +166,6 @@ namespace Student_Center_3._0_Database.Migrations
                     b.Property<string>("courseName")
                         .IsRequired()
                         .HasColumnType("nvarchar(60)");
-
-                    b.Property<string>("courseSuffix")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(3)");
 
                     b.Property<double>("courseWeight")
                         .HasColumnType("float");

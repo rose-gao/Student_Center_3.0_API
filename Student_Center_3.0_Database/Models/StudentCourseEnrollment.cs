@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
+using Student_Center_3._0_Database.Utils;
 
 namespace Student_Center_3._0_Database.Models
 {
@@ -17,9 +19,16 @@ namespace Student_Center_3._0_Database.Models
         [Column(TypeName = "nvarchar(60)")]
         public string courseName { get; set; }
 
-        // ex. "A" for Computer Science 1026A
         [Column(TypeName = "nvarchar(3)")]
         public string courseSuffix { get; set; }
+
+        [JsonProperty("startDate")]
+        [JsonConverter(typeof(CustomDateTimeConverterUtils))]
+        public DateTime startDate { get; set; }
+
+        [JsonProperty("endDate")]
+        [JsonConverter(typeof(CustomDateTimeConverterUtils))]
+        public DateTime endDate { get; set; }
 
         public double courseWeight { get; set; }
     }
