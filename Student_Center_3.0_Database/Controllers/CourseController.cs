@@ -19,12 +19,10 @@ namespace Student_Center_3._0_Database.Controllers
     public class CourseController : ControllerBase
     {
         private readonly StudentCenterContext _context;
-        private readonly IConfiguration _configuration;
 
-        public CourseController(StudentCenterContext context, IConfiguration configuration)
+        public CourseController(StudentCenterContext context)
         {
             _context = context;
-            _configuration = configuration;
         }
 
 
@@ -157,7 +155,7 @@ namespace Student_Center_3._0_Database.Controllers
             return NoContent();
         }
 
-        /*
+        
         // GET: api/Course/search?query={searchString}
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Course>>> SearchCourses(string query)
@@ -187,39 +185,7 @@ namespace Student_Center_3._0_Database.Controllers
 
             return Ok(filteredCourses);
         }
-        */
-
-        [HttpPost("executeQuery")]
-        public async Task<IActionResult> ExecuteQuery([FromBody] string sqlQuery)
-        {
-            Console.WriteLine(sqlQuery);
-            if (string.IsNullOrWhiteSpace(sqlQuery))
-            {
-                return BadRequest("SQL query cannot be empty.");
-            }
-
-            // Optional: Basic validation to ensure it's a SELECT query
-            if (!sqlQuery.Trim().StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
-            {
-                return BadRequest("Only SELECT queries are allowed.");
-            }
-
-            try
-            {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DevConnection")))
-                {
-                    await connection.OpenAsync();
-
-                    // Using Dapper to execute the query and return results
-                    var results = await connection.QueryAsync(sqlQuery);
-                    return Ok(results);
-                }
-            }
-            catch (SqlException ex)
-            {
-                return StatusCode(500, $"Error executing query: {ex.Message}");
-            }
-        }
+        
 
         [HttpPatch("{courseNum}/update-enrollment")]
         public async Task<IActionResult> UpdateCourseEnrollment(int courseNum, [FromBody] int updatedNumEnrolled)

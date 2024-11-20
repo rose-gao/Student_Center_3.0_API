@@ -133,7 +133,7 @@ namespace Student_Center_3._0_Services.Services
 
         }
 
-        public async Task<bool> VerifyNoConflicts(CourseDTO courseRecord, List<StudentCourseEnrollmentDTO> studentCourseEnrollment)
+        private async Task<bool> VerifyNoConflicts(CourseDTO courseRecord, List<StudentCourseEnrollmentDTO> studentCourseEnrollment)
         {
             // GET LIST OF CLASS TIMES FOR THE STUDENT'S ENROLLED COURSES
             var classList = new List<int> { courseRecord.courseNum };
@@ -159,7 +159,7 @@ namespace Student_Center_3._0_Services.Services
                 string courseNumList = string.Join(",", classList);
                 string query = $"SELECT * FROM CourseTimes WHERE courseNum IN ({courseNumList})";
 
-                var response = await _httpClient.PostAsJsonAsync("api/Course/executeQuery", query);
+                var response = await _httpClient.PostAsJsonAsync("api/GeneralQuery/executeQuery", query);
 
                 // No enrolled courses to fetch times for
                 if (!response.IsSuccessStatusCode)

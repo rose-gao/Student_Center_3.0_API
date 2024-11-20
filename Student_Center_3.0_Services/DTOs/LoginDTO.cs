@@ -2,8 +2,8 @@
 {
     public class LoginDTO
     {
-        public string UserId { get; set; }
-        public string Password { get; set; }
+        public string userId { get; set; }
+        public string password { get; set; }
         public int userNum { get; set; }
     }
 }

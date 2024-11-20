@@ -18,7 +18,7 @@ namespace Student_Center_3._0_Services.Controllers
         [HttpGet("ValidateLogin")]
         public async Task<IActionResult> ValidateLogin(string userId, string password)
         {
-            var userNum = await _loginService.ValidateUserCredentialsAsync(userId, password);
+            var userNum = await _loginService.ValidateUserCredentials(userId, password);
 
             if (userNum != -1)
             {

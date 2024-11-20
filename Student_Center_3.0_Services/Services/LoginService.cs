@@ -17,7 +17,7 @@ namespace Student_Center_3._0_Services.Services
             _httpClient = httpClient;
         }
 
-        public async Task<int> ValidateUserCredentialsAsync(string userId, string password)
+        public async Task<int> ValidateUserCredentials(string userId, string password)
         {
             var encryptedPassword = EncryptPassword(password);
 
@@ -36,7 +36,7 @@ namespace Student_Center_3._0_Services.Services
             }
 
             // Check if the encrypted password matches the one in the database
-            if (loginRecord.Password == encryptedPassword)
+            if (loginRecord.password == encryptedPassword)
             {
                 return loginRecord.userNum;
             }
