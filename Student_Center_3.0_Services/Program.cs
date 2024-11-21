@@ -10,6 +10,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<AddCourseService>();
+builder.Services.AddScoped<CourseEnrollmentService>();
+builder.Services.AddScoped<HttpClient>();
+
+
 builder.Services.AddHttpClient<LoginService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7176");
@@ -20,7 +25,12 @@ builder.Services.AddHttpClient<UserService>(client =>
     client.BaseAddress = new Uri("https://localhost:7176");
 });
 
-builder.Services.AddHttpClient<CourseEnrollmentService>(client =>
+//builder.Services.AddHttpClient<CourseEnrollmentService>(client =>
+//{
+//    client.BaseAddress = new Uri("https://localhost:7176");
+//});
+
+builder.Services.AddHttpClient<AddCourseService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7176");
 });
@@ -29,7 +39,6 @@ builder.Services.AddHttpClient<CourseService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7176");
 });
-
 
 
 var app = builder.Build();

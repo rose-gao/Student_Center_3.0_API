@@ -16,20 +16,6 @@ namespace Student_Center_3._0_Services.Controllers
             _courseEnrollmentService = courseEnrollmentService;
         }
 
-        // GET: api/CourseEnrollmentService/VerifyEnrollmentRequirements/{userNum}/{requestedCourse}
-        [HttpGet("VerifyEnrollmentRequirements/{userNum}/{requestedCourse}")]
-        public async Task<ActionResult<bool>> VerifyEnrollmentRequirements(int userNum, string requestedCourse)
-        {
-            // Call the CheckPrerequisite method from CourseService
-            bool result = await _courseEnrollmentService.VerifyEnrollmentRequirements(userNum, requestedCourse);
-
-            // Return the result as a response
-            if (result)
-            {
-                return Ok(true); // If prerequisites are fulfilled, return true
-            }
-            return BadRequest("Prerequisite not fulfilled or no course history found.");
-        }
 
         // Post: api/CourseEnrollmentService/AddCourse/{userNum}/{courseNum}
         [HttpPost("AddCourse/{userNum}/{courseNum}")]
