@@ -23,13 +23,8 @@ namespace Student_Center_3._0_Services.Services
 
         public async Task<string> AddCourse(int userNum, int courseNum)
         {
-
-            var url = $"api/Course/{courseNum}";
-            Console.WriteLine($"Request URL: {new Uri(_httpClient.BaseAddress, url)}");
-
-
             // IS COURSE FULL?
-            var courseResponse = await _httpClient.GetAsync(url);
+            var courseResponse = await _httpClient.GetAsync($"api/Course/{courseNum}");
 
             if (!courseResponse.IsSuccessStatusCode)
             {

@@ -15,17 +15,23 @@ namespace Student_Center_3._0_Services.Services
     public class CourseEnrollmentService
     {
         private readonly AddCourseService _addCourseService;
+        private readonly DropCourseService _dropCourseService;
 
-        public CourseEnrollmentService(AddCourseService addCourseService)
+        public CourseEnrollmentService(AddCourseService addCourseService, DropCourseService dropCourseService)
         {
-            _addCourseService = addCourseService; // Ensure proper injection
+            _addCourseService = addCourseService; 
+            _dropCourseService = dropCourseService;
         }
 
         public async Task<string> AddCourse(int userNum, int courseNum)
         {
             return await _addCourseService.AddCourse(userNum, courseNum);
         }
-    
+
+        public async Task<string> DropCourse(int userNum, int courseNum)
+        {
+            return await _dropCourseService.DropCourse(userNum, courseNum);
+        }
 
     }
 

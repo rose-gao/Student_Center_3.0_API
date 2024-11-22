@@ -34,6 +34,23 @@ namespace Student_Center_3._0_Services.Controllers
             return BadRequest($"Failed to add course: {result}");
         }
 
+        // Post: api/CourseEnrollmentService/AddCourse/{userNum}/{courseNum}
+        [HttpPost("DropCourse/{userNum}/{courseNum}")]
+        public async Task<ActionResult<string>> DropCourse(int userNum, int courseNum)
+        {
+            // Call the AddCourse method from CourseEnrollmentService
+            string result = await _courseEnrollmentService.DropCourse(userNum, courseNum);
+
+            // Return the result as a response
+            if (result == "OK")
+            {
+                return Ok("Course successfully dropped."); // Success response with a message
+            }
+
+            // Return error message from the service
+            return BadRequest($"Failed to drop course: {result}");
+        }
+
     }
 
 }
