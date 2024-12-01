@@ -12,6 +12,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<AddCourseService>();
 builder.Services.AddScoped<DropCourseService>();
+builder.Services.AddScoped<SwapCourseService>();
 builder.Services.AddScoped<CourseEnrollmentService>();
 builder.Services.AddScoped<HttpClient>();
 
@@ -32,6 +33,11 @@ builder.Services.AddHttpClient<AddCourseService>(client =>
 });
 
 builder.Services.AddHttpClient<DropCourseService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7176");
+});
+
+builder.Services.AddHttpClient<SwapCourseService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7176");
 });

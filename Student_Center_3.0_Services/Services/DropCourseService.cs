@@ -60,7 +60,7 @@ namespace Student_Center_3._0_Services.Services
                 return $"{updateCourseResponse.StatusCode}";
             }
 
-            return "Course successfully dropped.";
+            return "OK";
         }
 
     }

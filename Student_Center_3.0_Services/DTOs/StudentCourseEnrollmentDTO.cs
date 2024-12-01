@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Student_Center_3._0_Database.DTOs
+namespace Student_Center_3._0_Services.DTOs
 {
     public class StudentCourseEnrollmentDTO
     {
