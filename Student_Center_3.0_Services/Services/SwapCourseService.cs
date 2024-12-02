@@ -17,76 +17,94 @@ namespace Student_Center_3._0_Services.Services
             _dropCourseService = dropCourseService;
         }
 
-        public async Task<string> SwapCourse(int userNum, int dropCourseNum, int addCourseNum)
+        public async Task<string> SwapCourse(int userNum, int dropCourseNum, List<int> addCourseNums)
         {
-            if (userNum <= 0 || dropCourseNum <= 0 || addCourseNum <= 0)
+            var errors = new StringBuilder();
+
+            // Fetch drop course record
+            var dropRecord = await GetEnrollmentRecordAsync(userNum, dropCourseNum);
+            if (dropRecord == null)
+                return $"Failed to fetch course details for {dropCourseNum}.";
+
+            // Fetch associated courses for dropping
+            var coursesToDrop = await GetAssociatedCoursesAsync(userNum, dropRecord.courseName, dropRecord.courseSuffix);
+
+            // Attempt to drop courses
+            foreach (var course in coursesToDrop)
             {
-                throw new ArgumentException("UserNum, DropCourseNum, and AddCourseNum must be greater than zero.");
+                var dropResponse = await _httpClient.DeleteAsync($"api/StudentCourseEnrollment/{userNum}/{course.courseNum}");
+                if (!dropResponse.IsSuccessStatusCode)
+                {
+                    errors.AppendLine($"Failed to drop course {course.courseNum}: {dropResponse.StatusCode}");
+                    await RollbackAsync(userNum, coursesToDrop); // Rollback immediately
+                    return errors.ToString();
+                }
             }
 
-            if (dropCourseNum == addCourseNum)
-            {
-                throw new ArgumentException("Cannot swap the same course.");
-            }
-
-
-            // SET UP ROLLBACKS-- retrieve current enrollment record for rollback purposes
-            var getEnrollmentResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/{userNum}/{dropCourseNum}");
-            if (!getEnrollmentResponse.IsSuccessStatusCode)
-            {
-                return $"Failed to retrieve enrollment for rollback--{getEnrollmentResponse.StatusCode}";
-            }
-
-            var droppedCourse = await getEnrollmentResponse.Content.ReadFromJsonAsync<StudentCourseEnrollmentDTO>();
-            if (droppedCourse == null)
-            {
-                return "Failed to fetch dropped course details for rollback.";
-            }
-
-            // Temporarily delete course
-            var dropResponse = await _httpClient.DeleteAsync($"api/StudentCourseEnrollment/{userNum}/{dropCourseNum}");
-            if (!dropResponse.IsSuccessStatusCode)
-            {
-                return $"Failed to drop course--{dropResponse.StatusCode}";
-            }
-
-            // ADD NEW COURSE
-            string addResponse = await _addCourseService.AddSingleCourse(userNum, addCourseNum);
+            // Attempt to add new courses
+            string addResponse = await _addCourseService.AddCourse(userNum, addCourseNums);
             if (addResponse != "OK")
             {
-                // Rollback drop operation
-                var rollbackResponse = await _httpClient.PostAsJsonAsync("api/StudentCourseEnrollment", droppedCourse);
-                return $"Failed to add course. Add Response: {addResponse}, Rollback Response: {rollbackResponse.StatusCode}";
+                await RollbackAsync(userNum, coursesToDrop); // Rollback drops, adds are already atomic
+                return $"Failed to add courses: {addResponse}.";
             }
 
-            // FINISH DROPPING-- Decrement enrollment in dropped course
-            var courseResponse = await _httpClient.GetAsync($"api/Course/{dropCourseNum}");
-            if (!courseResponse.IsSuccessStatusCode)
+            // Decrement enrollment for dropped courses
+            foreach (var course in coursesToDrop)
             {
-                return $"Failed to fetch course details--{courseResponse.StatusCode}";
+                var courseDTO = await GetCourseAsync(course.courseNum);
+                if (courseDTO == null)
+                {
+                    errors.AppendLine($"Failed to fetch course {course.courseNum} for enrollment update.");
+                    continue;
+                }
+
+                string updateResponse = await _dropCourseService.UpdateCourseEnrollment(courseDTO, -1);
+                if (updateResponse != "OK")
+                {
+                    errors.AppendLine($"Failed to update enrollment for course {course.courseNum}: {updateResponse}");
+                }
             }
 
-            var courseRecord = await courseResponse.Content.ReadFromJsonAsync<CourseDTO>();
-            if (courseRecord == null)
-            {
-                return "Dropped course record not found.";
-            }
-
-            if (courseRecord.numEnrolled > 0)
-            {
-                courseRecord.numEnrolled -= 1;
-            }
-
-            // Update course enrollment
-            var content = new StringContent(courseRecord.numEnrolled.ToString(), Encoding.UTF8, "application/json");
-            var updateCourseResponse = await _httpClient.PatchAsync($"api/Course/{dropCourseNum}/update-enrollment", content);
-
-            if (!updateCourseResponse.IsSuccessStatusCode)
-            {
-                return $"Failed to update dropped course enrollment--{updateCourseResponse.StatusCode}";
-            }
-
-            return "OK";
+            return errors.Length > 0 ? errors.ToString() : "OK";
         }
+
+        private async Task<StudentCourseEnrollmentDTO?> GetEnrollmentRecordAsync(int userNum, int courseNum)
+        {
+            var response = await _httpClient.GetAsync($"api/StudentCourseEnrollment/{userNum}/{courseNum}");
+            return response.IsSuccessStatusCode
+                ? await response.Content.ReadFromJsonAsync<StudentCourseEnrollmentDTO>()
+                : null;
+        }
+
+        private async Task<List<StudentCourseEnrollmentDTO>> GetAssociatedCoursesAsync(int userNum, string courseName, string courseSuffix)
+        {
+            var response = await _httpClient.GetAsync($"api/StudentCourseEnrollment/user/{userNum}");
+            if (!response.IsSuccessStatusCode)
+                return new List<StudentCourseEnrollmentDTO>();
+
+            var enrollments = await response.Content.ReadFromJsonAsync<List<StudentCourseEnrollmentDTO>>();
+            return enrollments?.Where(e => e.courseName == courseName && e.courseSuffix == courseSuffix).ToList()
+                   ?? new List<StudentCourseEnrollmentDTO>();
+        }
+
+        private async Task<CourseDTO?> GetCourseAsync(int courseNum)
+        {
+            var response = await _httpClient.GetAsync($"api/Course/{courseNum}");
+            return response.IsSuccessStatusCode
+                ? await response.Content.ReadFromJsonAsync<CourseDTO>()
+                : null;
+        }
+
+        private async Task RollbackAsync(int userNum, List<StudentCourseEnrollmentDTO> coursesToDrop)
+        {
+            var errors = new List<string>();
+            foreach (var course in coursesToDrop)
+            {
+                var rollbackResponse = await _httpClient.PostAsJsonAsync("api/StudentCourseEnrollment", course);
+
+            }
+        }
+            
     }
 }

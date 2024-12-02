@@ -16,10 +16,7 @@ namespace Student_Center_3._0_Services.Services
 
         public async Task<string> DropCourse(int userNum, int courseNum)
         {
-            if (userNum <= 0 || courseNum <= 0)
-            {
-                throw new ArgumentException("UserNum and CourseNum must be greater than zero.");
-            }
+            
             // CHECK IF STUDENT IS ENROLLED IN THE COURSE
             var isEnrolled = await _httpClient.GetAsync($"api/StudentCourseEnrollment/{userNum}/{courseNum}");
             if (!isEnrolled.IsSuccessStatusCode)
@@ -55,7 +52,6 @@ namespace Student_Center_3._0_Services.Services
             {
                 if (enrollmentRecord.courseName == courseRecord.courseName && enrollmentRecord.courseSuffix == courseRecord.courseSuffix)
                 {
-                    // Drop auxiliary LAB/TUT
                     var dropResponse = await DropSingleCourse(userNum, enrollmentRecord.courseNum);
                     if (dropResponse != "OK")
                     {

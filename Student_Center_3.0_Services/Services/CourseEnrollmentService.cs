@@ -34,9 +34,9 @@ namespace Student_Center_3._0_Services.Services
             return await _dropCourseService.DropCourse(userNum, courseNum);
         }
 
-        public async Task<string> SwapCourse(int userNum, int dropCourseNum, int addCourseNum)
+        public async Task<string> SwapCourse(int userNum, int dropCourseNum, List<int> addCourseNums)
         {
-            return await _swapCourseService.SwapCourse(userNum, dropCourseNum, addCourseNum);
+            return await _swapCourseService.SwapCourse(userNum, dropCourseNum, addCourseNums);
         }
 
     }

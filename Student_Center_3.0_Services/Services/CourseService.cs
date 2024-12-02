@@ -57,7 +57,6 @@ public class CourseService
         // Add lab components to their parent courses
         foreach (var course in mainCourses)
         {
-            Console.WriteLine("course");
             // Identify matching lab components for each course by courseName and courseSuffix
 
             foreach (var lab in labs)

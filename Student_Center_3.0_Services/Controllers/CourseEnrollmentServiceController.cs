@@ -44,6 +44,11 @@ namespace Student_Center_3._0_Services.Controllers
         [HttpPost("DropCourse/{userNum}/{courseNum}")]
         public async Task<ActionResult<string>> DropCourse(int userNum, int courseNum)
         {
+            if (userNum <= 0 || courseNum <= 0)
+            {
+                return BadRequest("UserNum and CourseNum must be greater than zero.");
+            }
+
             // Call the AddCourse method from CourseEnrollmentService
             string result = await _courseEnrollmentService.DropCourse(userNum, courseNum);
 
@@ -58,11 +63,20 @@ namespace Student_Center_3._0_Services.Controllers
         }
 
         // Post: api/CourseEnrollmentService/SwapCourse/{userNum}/{dropCourseNum}/{addCourseNum}
-        [HttpPost("SwapCourse/{userNum}/{dropCourseNum}/{addCourseNum}")]
-        public async Task<ActionResult<string>> SwapCourse(int userNum, int dropCourseNum, int addCourseNum)
+        [HttpPost("SwapCourse/{userNum}/{dropCourseNum}")]
+        public async Task<ActionResult<string>> SwapCourse(int userNum, int dropCourseNum, [FromBody] List<int> addCourseNums)
         {
+            // Validate input
+            if (userNum <= 0 || dropCourseNum <= 0 || addCourseNums == null || !addCourseNums.Any() || addCourseNums.Any(c => c <= 0))
+            {
+                return BadRequest("Invalid input. Ensure userNum, dropCourseNum, and addCourseNums are valid.");
+            }
+
+            if (addCourseNums.Contains(dropCourseNum))
+                return BadRequest("Cannot swap the same course.");
+
             // Call the AddCourse method from CourseEnrollmentService
-            string result = await _courseEnrollmentService.SwapCourse(userNum, dropCourseNum, addCourseNum);
+            string result = await _courseEnrollmentService.SwapCourse(userNum, dropCourseNum, addCourseNums);
 
             // Return the result as a response
             if (result == "OK")
