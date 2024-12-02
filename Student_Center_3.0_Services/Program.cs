@@ -10,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//builder.Services.AddScoped<ScheduleService>();
 builder.Services.AddScoped<AddCourseService>();
 builder.Services.AddScoped<DropCourseService>();
 builder.Services.AddScoped<SwapCourseService>();
@@ -43,6 +44,11 @@ builder.Services.AddHttpClient<SwapCourseService>(client =>
 });
 
 builder.Services.AddHttpClient<CourseService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7176");
+});
+
+builder.Services.AddHttpClient<ScheduleService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7176");
 });

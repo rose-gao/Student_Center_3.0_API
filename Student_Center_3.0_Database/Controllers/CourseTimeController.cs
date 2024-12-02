@@ -43,14 +43,12 @@ namespace Student_Center_3._0_Database.Controllers
 
         // GET: api/StudentCourseEnrollment/course/{courseNum}
         [HttpGet("course/{courseNum}")]
-        public async Task<ActionResult<Dictionary<int, List<TimeSpan>>>> GetTimesByCourses(int courseNum)
+        public async Task<ActionResult<List<CourseTime>>> GetTimesByCourses(int courseNum)
         {
+            // Fetch all columns for the courses the user is enrolled in
             var courseTimes = await _context.CourseTimes
                 .Where(ct => ct.courseNum == courseNum)
-                .ToDictionaryAsync(
-                    ct => ct.weekday, // Key: weekday
-                    ct => new List<TimeSpan> { ct.startTime, ct.endTime } // Value: List of startTime and endTime
-                );
+                .ToListAsync();
 
             if (courseTimes == null || !courseTimes.Any())
             {
@@ -59,7 +57,6 @@ namespace Student_Center_3._0_Database.Controllers
 
             return courseTimes;
         }
-
 
         // PUT: api/CourseTime/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

@@ -59,7 +59,7 @@ namespace Student_Center_3._0_Services.Services
                     totalCredits = enrolledCourses.Sum(crs => crs.courseWeight);
 
                     // HAS STUDENT ALREADY ENROLLED IN THIS COURSE?
-                    bool courseExists = enrolledCourses.Any(course => course.courseName == courseRecord.courseName);
+                    bool courseExists = enrolledCourses.Any(course => course.courseNum == courseRecord.courseNum);
                     if (courseExists)
                     {
                         return "Duplicate Enrollment";
@@ -198,7 +198,7 @@ namespace Student_Center_3._0_Services.Services
                     }
 
                     // Add the course times as a nested list [startTime, endTime]
-                    courseToVerify[courseTime.weekday].Add(new List<TimeSpan> { TimeSpan.Parse(courseTime.startTime), TimeSpan.Parse(courseTime.endTime) });
+                    courseToVerify[courseTime.weekday].Add(new List<TimeSpan> { courseTime.startTime, courseTime.endTime });
 
                     continue;
 
@@ -211,7 +211,7 @@ namespace Student_Center_3._0_Services.Services
                 }
 
                 // Add the course times as a nested list [startTime, endTime]
-                courseSchedule[courseTime.weekday].Add(new List<TimeSpan> { TimeSpan.Parse(courseTime.startTime), TimeSpan.Parse(courseTime.endTime)});
+                courseSchedule[courseTime.weekday].Add(new List<TimeSpan> { courseTime.startTime, courseTime.endTime});
             }
 
             // Sort the class times for each weekday by startTime
