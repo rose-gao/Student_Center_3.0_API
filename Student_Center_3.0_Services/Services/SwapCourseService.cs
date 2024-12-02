@@ -8,11 +8,13 @@ namespace Student_Center_3._0_Services.Services
     {
         private readonly HttpClient _httpClient;
         private readonly AddCourseService _addCourseService;
+        private readonly DropCourseService _dropCourseService;
 
-        public SwapCourseService(HttpClient httpClient, AddCourseService addCourseService)
+        public SwapCourseService(HttpClient httpClient, AddCourseService addCourseService, DropCourseService dropCourseService)
         {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _addCourseService = addCourseService ?? throw new ArgumentNullException(nameof(addCourseService));
+            _httpClient = httpClient;
+            _addCourseService = addCourseService;
+            _dropCourseService = dropCourseService;
         }
 
         public async Task<string> SwapCourse(int userNum, int dropCourseNum, int addCourseNum)
@@ -28,7 +30,7 @@ namespace Student_Center_3._0_Services.Services
             }
 
 
-            // Retrieve current enrollment record for rollback purposes
+            // SET UP ROLLBACKS-- retrieve current enrollment record for rollback purposes
             var getEnrollmentResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/{userNum}/{dropCourseNum}");
             if (!getEnrollmentResponse.IsSuccessStatusCode)
             {

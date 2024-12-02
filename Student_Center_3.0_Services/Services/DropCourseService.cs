@@ -27,18 +27,7 @@ namespace Student_Center_3._0_Services.Services
                 return $"Student is not enrolled in course";
             }
 
-            // GET MAIN COURSE TO DELETE
-            var courseResponse = await _httpClient.GetAsync($"api/Course/{courseNum}");
-            if (!courseResponse.IsSuccessStatusCode)
-            {
-                return $"Failed to fetch course {courseNum}: {courseResponse.StatusCode}";
-            }
-
-            var courseRecord = await courseResponse.Content.ReadFromJsonAsync<CourseDTO>();
-            if (courseRecord == null)
-            {
-                return $"Course {courseNum} not found.";
-            }
+            var courseRecord = await isEnrolled.Content.ReadFromJsonAsync<StudentCourseEnrollmentDTO>();
 
             // GET LIST OF COURSES TO DELETE (including associated LABs/TUTs)
             var enrollmentResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/user/{userNum}");
@@ -53,25 +42,18 @@ namespace Student_Center_3._0_Services.Services
                 return $"No courses found for user {userNum}.";
             }
 
+            return await ProcessCourseDrops(userNum, courseRecord, enrollmentRecords);
+
+        }
+        
+        // HELPER: delete all courses in list
+        internal async Task<string> ProcessCourseDrops(int userNum, StudentCourseEnrollmentDTO courseRecord, List<StudentCourseEnrollmentDTO> enrollmentRecords)
+        { 
             var errors = new List<string>();
 
             foreach (var enrollmentRecord in enrollmentRecords)
             {
-                if (enrollmentRecord.courseNum == courseNum)
-                {
-                    var dropResponse = await _httpClient.DeleteAsync($"api/StudentCourseEnrollment/{userNum}/{courseNum}");
-                    if (!dropResponse.IsSuccessStatusCode)
-                    {
-                        errors.Add($"Failed to delete enrollment: {dropResponse.StatusCode}");
-                    }
-                    // Drop the main course
-                    var updateResult = await UpdateCourseEnrollment(courseRecord, -1);
-                    if (updateResult != "OK")
-                    {
-                        errors.Add($"Failed to update enrollment for course {courseRecord.courseNum}: {updateResult}");
-                    }
-                }
-                else if (enrollmentRecord.courseName == courseRecord.courseName && enrollmentRecord.courseSuffix == courseRecord.courseSuffix)
+                if (enrollmentRecord.courseName == courseRecord.courseName && enrollmentRecord.courseSuffix == courseRecord.courseSuffix)
                 {
                     // Drop auxiliary LAB/TUT
                     var dropResponse = await DropSingleCourse(userNum, enrollmentRecord.courseNum);
@@ -116,7 +98,7 @@ namespace Student_Center_3._0_Services.Services
             return await UpdateCourseEnrollment(courseRecord, -1);
         }
 
-        private async Task<string> UpdateCourseEnrollment(CourseDTO courseRecord, int change)
+        internal async Task<string> UpdateCourseEnrollment(CourseDTO courseRecord, int change)
         {
             if (courseRecord.numEnrolled + change < 0)
             {
