@@ -44,7 +44,7 @@ namespace Student_Center_3._0_Services.Services
         }
         
         // HELPER: delete all courses in list
-        public async Task<string> ProcessCourseDrops(int userNum, StudentCourseEnrollmentDTO courseRecord, List<StudentCourseEnrollmentDTO> enrollmentRecords)
+        internal async Task<string> ProcessCourseDrops(int userNum, StudentCourseEnrollmentDTO courseRecord, List<StudentCourseEnrollmentDTO> enrollmentRecords)
         { 
             var errors = new List<string>();
 
@@ -63,7 +63,8 @@ namespace Student_Center_3._0_Services.Services
             return errors.Any() ? string.Join("; ", errors) : "OK";
         }
 
-        public async Task<string> DropSingleCourse(int userNum, int courseNum)
+        // HELPER: logic for dropping a singular course
+        internal async Task<string> DropSingleCourse(int userNum, int courseNum)
         {
             if (userNum <= 0 || courseNum <= 0)
             {
@@ -94,7 +95,8 @@ namespace Student_Center_3._0_Services.Services
             return await UpdateCourseEnrollment(courseRecord, -1);
         }
 
-        public async Task<string> UpdateCourseEnrollment(CourseDTO courseRecord, int change)
+        // HELPER: logic for updating enrollment numbers for a course
+        internal async Task<string> UpdateCourseEnrollment(CourseDTO courseRecord, int change)
         {
             if (courseRecord.numEnrolled + change < 0)
             {
