@@ -24,7 +24,7 @@ namespace Student_Center_3._0_Services.Services
             _swapCourseService = swapCourseService;
         }
 
-        public async Task<string> AddCourse(int userNum, int courseNum)
+        public async Task<string> AddCourse(int userNum, List<int> courseNum)
         {
             return await _addCourseService.AddCourse(userNum, courseNum);
         }

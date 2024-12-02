@@ -14,13 +14,48 @@ namespace Student_Center_3._0_Services.Services
     public class AddCourseService
     {
         private readonly HttpClient _httpClient;
+        private readonly DropCourseService _dropCourseService;
 
-        public AddCourseService(HttpClient httpClient)
+        public AddCourseService(HttpClient httpClient, DropCourseService dropCourseService)
         {
             _httpClient = httpClient;
+            _dropCourseService = dropCourseService;
         }
 
-        public async Task<string> AddCourse(int userNum, int courseNum)
+        public async Task<string> AddCourse(int userNum, List<int> courseNum)
+        {
+            string error = "";
+            List<int> successfulEnrollment = new List<int>();
+
+            // Adding must be atomic. If adding a Lab/tutorial fails, none should be added
+            foreach (var course in courseNum)
+            {
+                string addResponse = await AddSingleCourse(userNum, course);
+                if (addResponse != "OK")
+                {
+                    error += $"{course} failed to add: {addResponse} ";
+
+                    // ROLLBACK ADDS
+                    foreach (var enrollment in successfulEnrollment)
+                    {
+                        string dropResponse = await _dropCourseService.DropSingleCourse(userNum, enrollment);
+                        if (dropResponse != "OK")
+                        {
+                            error += $"{enrollment} failed to drop: {dropResponse} ";
+                        }
+                    }
+                    break;
+                }
+
+                successfulEnrollment.Add(course);
+            }
+
+            return error.Length > 0 ? error : "OK";
+        }
+
+
+        // HELPER: Begins logic of adding a singular course
+        internal async Task<string> AddSingleCourse(int userNum, int courseNum)
         {
             // IS COURSE FULL?
             var courseResponse = await _httpClient.GetAsync($"api/Course/{courseNum}");
@@ -59,7 +94,8 @@ namespace Student_Center_3._0_Services.Services
                     totalCredits = enrolledCourses.Sum(crs => crs.courseWeight);
 
                     // HAS STUDENT ALREADY ENROLLED IN THIS COURSE?
-                    bool courseExists = enrolledCourses.Any(course => course.courseNum == courseRecord.courseNum);
+                    // TODO: check if same name + alias not LAB/TUT
+                    bool courseExists = enrolledCourses.Any(crs => crs.courseNum == courseRecord.courseNum);
                     if (courseExists)
                     {
                         return "Duplicate Enrollment";

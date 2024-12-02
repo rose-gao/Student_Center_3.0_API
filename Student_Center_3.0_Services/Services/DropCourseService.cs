@@ -20,120 +20,122 @@ namespace Student_Center_3._0_Services.Services
             {
                 throw new ArgumentException("UserNum and CourseNum must be greater than zero.");
             }
+            // CHECK IF STUDENT IS ENROLLED IN THE COURSE
+            var isEnrolled = await _httpClient.GetAsync($"api/StudentCourseEnrollment/{userNum}/{courseNum}");
+            if (!isEnrolled.IsSuccessStatusCode)
+            {
+                return $"Student is not enrolled in course";
+            }
 
             // GET MAIN COURSE TO DELETE
             var courseResponse = await _httpClient.GetAsync($"api/Course/{courseNum}");
             if (!courseResponse.IsSuccessStatusCode)
             {
-                return $"{courseResponse.StatusCode}";
+                return $"Failed to fetch course {courseNum}: {courseResponse.StatusCode}";
             }
 
             var courseRecord = await courseResponse.Content.ReadFromJsonAsync<CourseDTO>();
             if (courseRecord == null)
             {
-                return "Course not found.";
+                return $"Course {courseNum} not found.";
             }
 
-            // GET LIST OF COURSES TO DELETE (ie. incl. associated LAB + TUT)
+            // GET LIST OF COURSES TO DELETE (including associated LABs/TUTs)
             var enrollmentResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/user/{userNum}");
             if (!enrollmentResponse.IsSuccessStatusCode)
             {
-                return $"{enrollmentResponse.StatusCode}";
+                return $"Failed to fetch enrollments for user {userNum}: {enrollmentResponse.StatusCode}";
             }
 
             var enrollmentRecords = await enrollmentResponse.Content.ReadFromJsonAsync<List<StudentCourseEnrollmentDTO>>();
-            string error = "";
-
-            foreach (var enrollmentRecord in enrollmentRecords) {
-                // Drop main course
-                if (enrollmentRecord.courseNum == courseRecord.courseNum)
-                {
-                    // Ensure numEnrolled does not go below zero
-                    if (courseRecord.numEnrolled > 0)
-                    {
-                        courseRecord.numEnrolled -= 1;
-                    }
-                    else
-                    {
-                        return "Cannot drop course; no students are currently enrolled.";
-                    }
-
-                    // Update course enrollment
-                    var content = new StringContent(courseRecord.numEnrolled.ToString(), Encoding.UTF8, "application/json");
-                    var updateCourseResponse = await _httpClient.PatchAsync($"api/Course/{courseNum}/update-enrollment", content);
-
-
-                    if (!updateCourseResponse.IsSuccessStatusCode)
-                    {
-                        error += $"{enrollmentRecord.courseNum} failed to drop: {updateCourseResponse.StatusCode} ";
-                    }
-
-                }
-            
-                // Drop auxilliary Labs/Tutorials (no checking if suffixes equal as the course and their labs/tuts will always be part of the same semester)
-                else if (enrollmentRecord.courseName == courseRecord.courseName)
-                {
-                    string removeResponse = await RemoveCourseEnrollment(userNum, enrollmentRecord.courseNum);
-                    if (removeResponse != "OK")
-                    {
-                        error += $"{enrollmentRecord.courseNum} failed to drop: {removeResponse} ";
-                    }
-                }
-            }
-
-            if (error.Length > 0)
+            if (enrollmentRecords == null || !enrollmentRecords.Any())
             {
-                return error;
+                return $"No courses found for user {userNum}.";
             }
 
-            return "OK";
+            var errors = new List<string>();
 
+            foreach (var enrollmentRecord in enrollmentRecords)
+            {
+                if (enrollmentRecord.courseNum == courseNum)
+                {
+                    var dropResponse = await _httpClient.DeleteAsync($"api/StudentCourseEnrollment/{userNum}/{courseNum}");
+                    if (!dropResponse.IsSuccessStatusCode)
+                    {
+                        errors.Add($"Failed to delete enrollment: {dropResponse.StatusCode}");
+                    }
+                    // Drop the main course
+                    var updateResult = await UpdateCourseEnrollment(courseRecord, -1);
+                    if (updateResult != "OK")
+                    {
+                        errors.Add($"Failed to update enrollment for course {courseRecord.courseNum}: {updateResult}");
+                    }
+                }
+                else if (enrollmentRecord.courseName == courseRecord.courseName && enrollmentRecord.courseSuffix == courseRecord.courseSuffix)
+                {
+                    // Drop auxiliary LAB/TUT
+                    var dropResponse = await DropSingleCourse(userNum, enrollmentRecord.courseNum);
+                    if (dropResponse != "OK")
+                    {
+                        errors.Add($"Failed to drop course {enrollmentRecord.courseNum}: {dropResponse}");
+                    }
+                }
+            }
+
+            return errors.Any() ? string.Join("; ", errors) : "OK";
         }
 
-        // HELPER: method to fully drop a course, incl. updating course enrollment numbers
-        private async Task<string> RemoveCourseEnrollment(int userNum, int courseNum) {
-            // Delete course enrollment
+        internal async Task<string> DropSingleCourse(int userNum, int courseNum)
+        {
+            if (userNum <= 0 || courseNum <= 0)
+            {
+                return "Invalid input.";
+            }
+
+            // DELETE COURSE ENROLLMENT
             var dropResponse = await _httpClient.DeleteAsync($"api/StudentCourseEnrollment/{userNum}/{courseNum}");
             if (!dropResponse.IsSuccessStatusCode)
             {
-                return $"{dropResponse.StatusCode}";
+                return $"Failed to delete enrollment: {dropResponse.StatusCode}";
             }
 
-            // DECREMENT NUMBER OF ENROLLED STUDENTS IN THE COURSE
+            // FETCH COURSE
             var courseResponse = await _httpClient.GetAsync($"api/Course/{courseNum}");
             if (!courseResponse.IsSuccessStatusCode)
             {
-                return $"{courseResponse.StatusCode}";
+                return $"Failed to fetch course {courseNum}: {courseResponse.StatusCode}";
             }
 
             var courseRecord = await courseResponse.Content.ReadFromJsonAsync<CourseDTO>();
             if (courseRecord == null)
             {
-                return "Course not found.";
+                return $"Course {courseNum} not found.";
             }
 
-            // Ensure numEnrolled does not go below zero
-            if (courseRecord.numEnrolled > 0)
+            // UPDATE COURSE ENROLLMENT
+            return await UpdateCourseEnrollment(courseRecord, -1);
+        }
+
+        private async Task<string> UpdateCourseEnrollment(CourseDTO courseRecord, int change)
+        {
+            if (courseRecord.numEnrolled + change < 0)
             {
-                courseRecord.numEnrolled -= 1;
-            }
-            else
-            {
-                return "Cannot drop course; no students are currently enrolled.";
+                return "Cannot reduce enrollment below zero.";
             }
 
-            // Update course enrollment
+            courseRecord.numEnrolled += change;
+
             var content = new StringContent(courseRecord.numEnrolled.ToString(), Encoding.UTF8, "application/json");
-            var updateCourseResponse = await _httpClient.PatchAsync($"api/Course/{courseNum}/update-enrollment", content);
+            var updateResponse = await _httpClient.PatchAsync($"api/Course/{courseRecord.courseNum}/update-enrollment", content);
 
-
-            if (!updateCourseResponse.IsSuccessStatusCode)
+            if (!updateResponse.IsSuccessStatusCode)
             {
-                return $"{updateCourseResponse.StatusCode}";
+                return $"Failed to update course {courseRecord.courseNum}: {updateResponse.StatusCode}";
             }
 
             return "OK";
         }
+
 
     }
 

@@ -18,21 +18,27 @@ namespace Student_Center_3._0_Services.Controllers
 
 
         // Post: api/CourseEnrollmentService/AddCourse/{userNum}/{courseNum}
-        [HttpPost("AddCourse/{userNum}/{courseNum}")]
-        public async Task<ActionResult<string>> AddCourse(int userNum, int courseNum)
+        [HttpPost("AddCourses/{userNum}")]
+        public async Task<ActionResult<string>> AddCourses(int userNum, [FromBody] List<int> courseNums)
         {
+            if (courseNums == null || !courseNums.Any())
+            {
+                return BadRequest("Course list cannot be null or empty.");
+            }
+
             // Call the AddCourse method from CourseEnrollmentService
-            string result = await _courseEnrollmentService.AddCourse(userNum, courseNum);
+            string result = await _courseEnrollmentService.AddCourse(userNum, courseNums);
 
             // Return the result as a response
             if (result == "OK")
             {
-                return Ok("Course successfully added."); // Success response with a message
+                return Ok("Courses successfully added."); // Success response with a message
             }
 
             // Return error message from the service
-            return BadRequest($"Failed to add course: {result}");
+            return BadRequest($"Failed to add courses: {result}");
         }
+
 
         // Post: api/CourseEnrollmentService/DropCourse/{userNum}/{courseNum}
         [HttpPost("DropCourse/{userNum}/{courseNum}")]

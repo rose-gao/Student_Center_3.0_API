@@ -49,7 +49,7 @@ namespace Student_Center_3._0_Services.Services
             }
 
             // ADD NEW COURSE
-            string addResponse = await _addCourseService.AddCourse(userNum, addCourseNum);
+            string addResponse = await _addCourseService.AddSingleCourse(userNum, addCourseNum);
             if (addResponse != "OK")
             {
                 // Rollback drop operation
