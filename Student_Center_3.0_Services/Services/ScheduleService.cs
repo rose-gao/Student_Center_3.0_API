@@ -13,19 +13,27 @@ namespace Student_Center_3._0_Services.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ScheduleResponseDTO?> GetSchedule(int userNum)
+        public async Task<ScheduleResponseDTO> GetSchedule(int userNum)
         {
             // Fetch enrolled courses
             var enrollmentResponse = await _httpClient.GetAsync($"api/StudentCourseEnrollment/user/{userNum}");
             if (!enrollmentResponse.IsSuccessStatusCode)
             {
-                throw new Exception($"Error fetching enrollments: {enrollmentResponse.StatusCode}");
+                return new ScheduleResponseDTO
+                {
+                    Semester1 = new List<object>(),
+                    Semester2 = new List<object>()
+                };
             }
 
             var enrollments = await enrollmentResponse.Content.ReadFromJsonAsync<List<StudentCourseEnrollmentDTO>>();
             if (enrollments == null || enrollments.Count == 0)
             {
-                return null;
+                return new ScheduleResponseDTO
+                {
+                    Semester1 = new List<object>(),
+                    Semester2 = new List<object>()
+                };
             }
 
             // Fetch and structure schedules

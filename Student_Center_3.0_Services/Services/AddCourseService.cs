@@ -183,6 +183,7 @@ namespace Student_Center_3._0_Services.Services
                 if ((crsStart >= courseRecord.startDate & crsStart <= courseRecord.endDate) |
                     (crsEnd >= courseRecord.startDate & crsEnd <= courseRecord.endDate))
                 {
+
                     classList.Add(enrollment.courseNum);
                 }
             }
@@ -218,7 +219,9 @@ namespace Student_Center_3._0_Services.Services
 
         // HELPER: check student's current timetable and see if any time overlaps will occur if the requested course is added to the schedule.
         private async Task<bool> CheckTimeOverlaps(int courseNum, List<CourseTimeDTO> enrolledCourseTimes) 
-        { 
+        {
+            Console.WriteLine(courseNum);
+
 
             // Process the data into the dictionary format
             var courseSchedule = new Dictionary<int, List<List<TimeSpan>>>();
@@ -289,6 +292,8 @@ namespace Student_Center_3._0_Services.Services
                         // if requested time range overlaps with a class time, return False
                         if (reqTime[0] <= classTime[0] || reqTime[1] >= classTime[1])
                         {
+                            Console.WriteLine("Conflict");
+                            Console.ReadKey();
                             return false;
                         }
                     }
