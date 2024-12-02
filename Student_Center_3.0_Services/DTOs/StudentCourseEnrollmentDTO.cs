@@ -12,6 +12,8 @@ namespace Student_Center_3._0_Services.DTOs
 
         public string courseSuffix { get; set; }
 
+        public string courseAlias { get; set; }
+
         public string startDate { get; set; }
 
         public string endDate { get; set; }

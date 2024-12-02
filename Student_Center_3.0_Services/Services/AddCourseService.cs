@@ -106,6 +106,7 @@ namespace Student_Center_3._0_Services.Services
                     courseNum = courseNum,
                     courseName = courseRecord.courseName,
                     courseSuffix = courseRecord.courseSuffix,
+                    courseAlias = courseRecord.courseAlias,
                     startDate = courseRecord.startDate.ToString("yyyy-MM-dd"),
                     endDate = courseRecord.endDate.ToString("yyyy-MM-dd"),
                     courseWeight = courseRecord.courseWeight

@@ -22,6 +22,9 @@ namespace Student_Center_3._0_Database.Models
         [Column(TypeName = "nvarchar(3)")]
         public string courseSuffix { get; set; }
 
+        [Column(TypeName = "nvarchar(60)")]
+        public string courseAlias { get; set; }
+
         [JsonProperty("startDate")]
         [JsonConverter(typeof(CustomDateTimeConverterUtils))]
         public DateTime startDate { get; set; }
