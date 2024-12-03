@@ -17,40 +17,41 @@ builder.Services.AddScoped<SwapCourseService>();
 builder.Services.AddScoped<CourseEnrollmentService>();
 builder.Services.AddScoped<HttpClient>();
 
+string uri = "https://localhost:7176";
 
 builder.Services.AddHttpClient<LoginService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7176");
+    client.BaseAddress = new Uri(uri);
 });
 
 builder.Services.AddHttpClient<UserService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7176");
+    client.BaseAddress = new Uri(uri);
 });
 
 builder.Services.AddHttpClient<AddCourseService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7176");
+    client.BaseAddress = new Uri(uri);
 });
 
 builder.Services.AddHttpClient<DropCourseService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7176");
+    client.BaseAddress = new Uri(uri);
 });
 
 builder.Services.AddHttpClient<SwapCourseService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7176");
+    client.BaseAddress = new Uri(uri);
 });
 
 builder.Services.AddHttpClient<CourseService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7176");
+    client.BaseAddress = new Uri(uri);
 });
 
 builder.Services.AddHttpClient<ScheduleService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7176");
+    client.BaseAddress = new Uri(uri);
 });
 
 
