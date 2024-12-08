@@ -43,13 +43,13 @@ namespace Student_Center_3._0_Services.Services
         {
             if (userDTO == null)
             {
-                return "Student information cannot be empty.";
+                return "User information cannot be empty.";
             }
 
             // CHECK THAT userNum IS VALID NUMBER OF DIGITS
             if (userDTO.userNum <= 0 || userDTO.userNum.ToString().Length != 9)
             {
-                return "Student Number must be 9 digits long.";
+                return "User Number must be 9 digits long.";
             }
 
             // CHECK VALIDITY OF NAMES

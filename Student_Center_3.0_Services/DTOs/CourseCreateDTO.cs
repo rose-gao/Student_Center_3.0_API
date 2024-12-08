@@ -2,10 +2,8 @@
 
 namespace Student_Center_3._0_Services.DTOs
 {
-    public class CourseDTO
+    public class CourseCreateDTO
     {
-        public int courseNum {  get; set; }
-
         [Required]
         [StringLength(60)]
         public string courseName { get; set; }
@@ -33,10 +31,10 @@ namespace Student_Center_3._0_Services.DTOs
         public double courseWeight { get; set; }
 
         [Required]
-        public DateTime startDate { get; set; }
+        public string startDate { get; set; }
 
         [Required]
-        public DateTime endDate { get; set; }
+        public string endDate { get; set; }
 
         public string? instructor { get; set; }
 

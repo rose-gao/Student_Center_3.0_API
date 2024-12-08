@@ -14,6 +14,7 @@ public class UserServiceController : ControllerBase
         _userService = userService;
     }
 
+    // GET: api/UserServiceController/userNum"
     [HttpGet("{userNum}")]
     public async Task<IActionResult> GetProfile(int userNum)
     {
@@ -27,6 +28,7 @@ public class UserServiceController : ControllerBase
         return Ok(user);
     }
 
+    // POST: api/UserServiceController"
     [HttpPost]
     public async Task<IActionResult> AddUser([FromBody] UserDTO user)
     {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Student_Center_3._0_Services.DTOs;
 using Student_Center_3._0_Services.Services;
 
 namespace Student_Center_3._0_Services.Controllers
@@ -34,5 +35,35 @@ namespace Student_Center_3._0_Services.Controllers
 
             return Ok(courses);
         }
+
+        // POST: api/CourseServicesController
+        [HttpPost]
+        public async Task<IActionResult> AddCourse([FromBody] CourseCreateDTO courseCreateDTO)
+        {
+            // For each user attribute, make some basic validation checks using the data annotaionts of UserDTO
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                // try to add user, incl. more complex validation logic
+                var result = await _courseService.AddCourse(courseCreateDTO);
+
+                if (result == "OK")
+                {
+                    return Ok(new { Message = "Course successfully added." });
+                }
+
+                return BadRequest(new { Message = result });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional: using a logging library like Serilog or NLog)
+                return StatusCode(500, new { Message = "An internal error occurred.", Details = ex.Message });
+            }
+        }
+
     }
 }

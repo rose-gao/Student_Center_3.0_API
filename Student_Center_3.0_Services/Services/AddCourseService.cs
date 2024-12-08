@@ -368,7 +368,7 @@ namespace Student_Center_3._0_Services.Services
          */
         private bool PrereqFulfilled(string prereqExp, Dictionary<string, double> courseHistory)
         {
-            var prereq = prereqExp.Split(',');
+            var prereq = prereqExp.Split(',').Select(a => a.Trim()).ToArray();
             var courseStack = new Stack<string>(); // stack of courses yet to be checked
             var groupStack = new Stack<bool>(); // stack of course groupings --> each group is a list of courses that previously had a logical operator applied to it
 

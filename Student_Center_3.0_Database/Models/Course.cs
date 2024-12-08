@@ -38,11 +38,11 @@ namespace Student_Center_3._0_Database.Models
         public double courseWeight { get; set; }
 
         [JsonProperty("startDate")]
-        [JsonConverter(typeof(CustomDateTimeConverterUtils))]
+        //JsonConverter(typeof(CustomDateTimeConverterUtils))]
         public DateTime startDate { get; set; }
 
         [JsonProperty("endDate")]
-        [JsonConverter(typeof(CustomDateTimeConverterUtils))]
+        //[JsonConverter(typeof(CustomDateTimeConverterUtils))]
         public DateTime endDate { get; set; }
 
         [Column(TypeName = "nvarchar(60)")]
