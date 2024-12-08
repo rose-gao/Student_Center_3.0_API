@@ -19,7 +19,6 @@ namespace Student_Center_3._0_Database.Models
         [Column(TypeName = "nvarchar(60)")]
         public string lastName { get; set; }
 
-        //dd/mm/yyyy
         [Column(TypeName = "nvarchar(10)")]
         public string birthday { get; set; }
 
