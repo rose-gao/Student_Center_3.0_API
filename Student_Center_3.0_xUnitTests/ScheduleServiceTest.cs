@@ -95,7 +95,7 @@ namespace Student_Center_3._0_xUnitTests
             Assert.Equal("Monday", sem1Schedule.GetType().GetProperty("Weekday")?.GetValue(sem1Schedule, null));
 
 
-            // Access the "Classes" property (assumed to be a list or enumerable)
+            // Access the "Classes" property 
             var classes = sem1Schedule.GetType().GetProperty("Classes")?.GetValue(sem1Schedule, null) as IEnumerable<object>;
             Assert.NotNull(classes);
 
@@ -115,7 +115,7 @@ namespace Student_Center_3._0_xUnitTests
             Assert.Equal("Wednesday", sem2Schedule.GetType().GetProperty("Weekday")?.GetValue(sem2Schedule, null));
 
 
-            // Access the "Classes" property (assumed to be a list or enumerable)
+            // Access the "Classes" property 
             classes = sem2Schedule.GetType().GetProperty("Classes")?.GetValue(sem2Schedule, null) as IEnumerable<object>;
             Assert.NotNull(classes);
 

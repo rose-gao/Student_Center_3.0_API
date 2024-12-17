@@ -36,7 +36,7 @@ namespace Student_Center_3._0_Services.Services
             var enrollmentRecords = await enrollmentResponse.Content.ReadFromJsonAsync<List<StudentCourseEnrollmentDTO>>();
             if (enrollmentRecords == null || !enrollmentRecords.Any())
             {
-                return $"No courses found for user {userNum}.";
+                return $"Failed to fetch enrollments for user {userNum}: {enrollmentResponse.StatusCode}";
             }
 
             return await ProcessCourseDrops(userNum, courseRecord, enrollmentRecords);
@@ -75,14 +75,14 @@ namespace Student_Center_3._0_Services.Services
             var dropResponse = await _httpClient.DeleteAsync($"api/StudentCourseEnrollment/{userNum}/{courseNum}");
             if (!dropResponse.IsSuccessStatusCode)
             {
-                return $"Failed to delete enrollment: {dropResponse.StatusCode}";
+                return $"Failed to delete enrollment- {dropResponse.StatusCode}";
             }
 
             // FETCH COURSE
             var courseResponse = await _httpClient.GetAsync($"api/Course/{courseNum}");
             if (!courseResponse.IsSuccessStatusCode)
             {
-                return $"Failed to fetch course {courseNum}: {courseResponse.StatusCode}";
+                return $"Failed to fetch course {courseNum}- {courseResponse.StatusCode}";
             }
 
             var courseRecord = await courseResponse.Content.ReadFromJsonAsync<CourseDTO>();
@@ -110,7 +110,7 @@ namespace Student_Center_3._0_Services.Services
 
             if (!updateResponse.IsSuccessStatusCode)
             {
-                return $"Failed to update course {courseRecord.courseNum}: {updateResponse.StatusCode}";
+                return $"Failed to update course {courseRecord.courseNum}- {updateResponse.StatusCode}";
             }
 
             return "OK";
