@@ -5,7 +5,9 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Student_Center_3.0_Database", "Student_Center_3.0_Database\Student_Center_3.0_Database.csproj", "{67A7432F-6F1E-463A-9E7E-C16F2EB3476B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Student_Center_3.0_Services", "Student_Center_3.0_Services\Student_Center_3.0_Services.csproj", "{87465A53-75B6-406E-823A-573ECA803F05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Student_Center_3.0_Services", "Student_Center_3.0_Services\Student_Center_3.0_Services.csproj", "{87465A53-75B6-406E-823A-573ECA803F05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Student_Center_3.0_xUnitTests", "Student_Center_3.0_xUnitTests\Student_Center_3.0_xUnitTests.csproj", "{9FF1642E-134F-4D7E-B05E-477CCDED4D52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{87465A53-75B6-406E-823A-573ECA803F05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87465A53-75B6-406E-823A-573ECA803F05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87465A53-75B6-406E-823A-573ECA803F05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FF1642E-134F-4D7E-B05E-477CCDED4D52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FF1642E-134F-4D7E-B05E-477CCDED4D52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FF1642E-134F-4D7E-B05E-477CCDED4D52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FF1642E-134F-4D7E-B05E-477CCDED4D52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

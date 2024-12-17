@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace Student_Center_3._0_Services.Services
 {
-    public class DropCourseService
+    public class DropCourseService 
     {
         private readonly HttpClient _httpClient;
 
@@ -44,7 +44,7 @@ namespace Student_Center_3._0_Services.Services
         }
         
         // HELPER: delete all courses in list
-        internal async Task<string> ProcessCourseDrops(int userNum, StudentCourseEnrollmentDTO courseRecord, List<StudentCourseEnrollmentDTO> enrollmentRecords)
+        public async Task<string> ProcessCourseDrops(int userNum, StudentCourseEnrollmentDTO courseRecord, List<StudentCourseEnrollmentDTO> enrollmentRecords)
         { 
             var errors = new List<string>();
 
@@ -63,7 +63,7 @@ namespace Student_Center_3._0_Services.Services
             return errors.Any() ? string.Join("; ", errors) : "OK";
         }
 
-        internal async Task<string> DropSingleCourse(int userNum, int courseNum)
+        public async Task<string> DropSingleCourse(int userNum, int courseNum)
         {
             if (userNum <= 0 || courseNum <= 0)
             {
@@ -94,7 +94,7 @@ namespace Student_Center_3._0_Services.Services
             return await UpdateCourseEnrollment(courseRecord, -1);
         }
 
-        internal async Task<string> UpdateCourseEnrollment(CourseDTO courseRecord, int change)
+        public async Task<string> UpdateCourseEnrollment(CourseDTO courseRecord, int change)
         {
             if (courseRecord.numEnrolled + change < 0)
             {
