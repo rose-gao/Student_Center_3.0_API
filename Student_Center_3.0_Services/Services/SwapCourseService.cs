@@ -36,7 +36,7 @@ namespace Student_Center_3._0_Services.Services
                 if (!dropResponse.IsSuccessStatusCode)
                 {
                     errors.AppendLine($"Failed to drop course {course.courseNum}: {dropResponse.StatusCode}");
-                    await RollbackAsync(userNum, coursesToDrop); // Rollback immediately
+                    await RollbackAsync(userNum, coursesToDrop); // Rollback immediately, rollback any courses already dropped
                     return errors.ToString();
                 }
             }
@@ -45,7 +45,7 @@ namespace Student_Center_3._0_Services.Services
             string addResponse = await _addCourseService.AddCourse(userNum, addCourseNums);
             if (addResponse != "OK")
             {
-                await RollbackAsync(userNum, coursesToDrop); // Rollback drops, adds are already atomic
+                await RollbackAsync(userNum, coursesToDrop); // Rollback all drops, adds are already atomic and are automatically rolledback by AddCourse()
                 return $"Failed to add courses: {addResponse}.";
             }
 
@@ -69,6 +69,7 @@ namespace Student_Center_3._0_Services.Services
             return errors.Length > 0 ? errors.ToString() : "OK";
         }
 
+        // HELPER: check if student is enrolled in the course they want to drop
         private async Task<StudentCourseEnrollmentDTO?> GetEnrollmentRecordAsync(int userNum, int courseNum)
         {
             var response = await _httpClient.GetAsync($"api/StudentCourseEnrollment/{userNum}/{courseNum}");
@@ -77,6 +78,7 @@ namespace Student_Center_3._0_Services.Services
                 : null;
         }
 
+        // HELPER: get any labs/tutorials that are associated with the course the student wants to drop
         private async Task<List<StudentCourseEnrollmentDTO>> GetAssociatedCoursesAsync(int userNum, string courseName, string courseSuffix)
         {
             var response = await _httpClient.GetAsync($"api/StudentCourseEnrollment/user/{userNum}");
@@ -88,6 +90,7 @@ namespace Student_Center_3._0_Services.Services
                    ?? new List<StudentCourseEnrollmentDTO>();
         }
 
+        // HELPER: fetch the course record from the Courses table
         private async Task<CourseDTO?> GetCourseAsync(int courseNum)
         {
             var response = await _httpClient.GetAsync($"api/Course/{courseNum}");
@@ -96,6 +99,7 @@ namespace Student_Center_3._0_Services.Services
                 : null;
         }
 
+        // HELPER: in case of errors when dropping a list of courses, rollback all changes by re-adding any courses already dropped. Errors in adding courses are automatically rolled back by AddCourse()
         private async Task RollbackAsync(int userNum, List<StudentCourseEnrollmentDTO> coursesToDrop)
         {
             var errors = new List<string>();
