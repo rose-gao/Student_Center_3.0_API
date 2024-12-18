@@ -161,7 +161,7 @@ namespace Student_Center_3._0_xUnitTests
                         courseSuffix = "A"
                     }));
 
-            // Simulate fetching all enrollments
+            // Simulate fetching all enrollments-- the second course has an invalid courseNum
             mockHttp.When($"http://localhost/api/StudentCourseEnrollment/user/{userNum}")
                     .Respond(HttpStatusCode.OK, JsonContent.Create(new List<StudentCourseEnrollmentDTO>
                     {
@@ -172,10 +172,6 @@ namespace Student_Center_3._0_xUnitTests
             // Mock deletion of course for userNum and courseNum
             mockHttp.When(HttpMethod.Delete, $"http://localhost/api/StudentCourseEnrollment/{userNum}/{courseNum}")
                     .Respond(HttpStatusCode.OK);
-
-            // Simulate a BadRequest when trying to delete course -2 (invalid input)
-            mockHttp.When($"http://localhost/api/StudentCourseEnrollment/{userNum}/-2")
-                    .Respond(HttpStatusCode.BadRequest);
 
             // Simulate fetching course details for courseNum
             mockHttp.When($"http://localhost/api/Course/{courseNum}")
