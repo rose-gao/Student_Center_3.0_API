@@ -30,7 +30,7 @@ public class UserServiceController : ControllerBase
 
     // POST: api/UserServiceController"
     [HttpPost]
-    public async Task<IActionResult> AddUser([FromBody] UserDTO user)
+    public async Task<IActionResult> AddUser([FromBody] UserLoginDTO user)
     {
         // For each user attribute, make some basic validation checks using the data annotaionts of UserDTO
         if (!ModelState.IsValid)

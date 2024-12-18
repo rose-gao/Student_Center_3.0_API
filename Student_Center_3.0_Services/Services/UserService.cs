@@ -39,81 +39,123 @@ namespace Student_Center_3._0_Services.Services
             return user;
         }
 
-        public async Task<string> AddUser(UserDTO userDTO)
+        public async Task<string> AddUser(UserLoginDTO userLoginDTO)
         {
-            if (userDTO == null)
+            if (userLoginDTO == null)
             {
                 return "User information cannot be empty.";
             }
 
             // CHECK THAT userNum IS VALID NUMBER OF DIGITS
-            if (userDTO.userNum <= 0 || userDTO.userNum.ToString().Length != 9)
+            if (userLoginDTO.userNum <= 0 || userLoginDTO.userNum.ToString().Length != 9)
             {
                 return "User Number must be 9 digits long.";
             }
 
             // CHECK VALIDITY OF NAMES
-            if (!userDTO.firstName.All(char.IsLetter))
+            if (!userLoginDTO.firstName.All(char.IsLetter))
             {
                 return "First name must only contain letters and be less than 60 characters.";
             }
 
-            if (!string.IsNullOrWhiteSpace(userDTO.middleName) && !userDTO.middleName.All(char.IsLetter))
+            if (!string.IsNullOrWhiteSpace(userLoginDTO.middleName) && !userLoginDTO.middleName.All(char.IsLetter))
             {
                 return "Middle name must only contain letters and be less than 60 characters.";
             }
 
-            if (!userDTO.lastName.All(char.IsLetter))
+            if (!userLoginDTO.lastName.All(char.IsLetter))
             {
                 return "Last name must only contain letters and be less than 60 characters.";
             }
 
             // CHECK SOCIAL INSURANCE NUMBER (SSN)
-            if (!userDTO.socialInsuranceNum.All(char.IsDigit))
+            if (!userLoginDTO.socialInsuranceNum.All(char.IsDigit))
             {
                 return "SSN must be 9 digits long.";
             }
 
             // CHECK BIRTHDAY FORMAT AND VALIDITY
-            if (!DateTime.TryParseExact(userDTO.birthday, "yyyy/MM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var birthday) ||
+            if (!DateTime.TryParseExact(userLoginDTO.birthday, "yyyy/MM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var birthday) ||
                 birthday > DateTime.Now)
             {
                 return "Birthday must be in dd/MM/yyyy format and cannot be in the future.";
             }
 
             // CHECK EMAIL FORMAT
-            if (!Regex.IsMatch(userDTO.email, @"^[a-zA-Z0-9._%+-]+@uwo\.ca$"))
+            if (!Regex.IsMatch(userLoginDTO.email, @"^[a-zA-Z0-9._%+-]+@uwo\.ca$"))
             {
                 return "Invalid email format. Must be a UWO email address.";
             }
 
             // CHECK PHONE NUMBER FORMAT
-            if (!userDTO.phoneNum.All(char.IsDigit))
+            if (!userLoginDTO.phoneNum.All(char.IsDigit))
             {
                 return "Phone number must be exactly 10 digits.";
             }
 
             // CHECK PROVINCE
             var validProvinces = new HashSet<string> { "ON", "BC", "AB", "MB", "SK", "QC", "NB", "NS", "PE", "NL", "YT", "NT", "NU" };
-            if (!validProvinces.Contains(userDTO.province))
+            if (!validProvinces.Contains(userLoginDTO.province))
             {
                 return "Invalid province code.";
             }
 
             // CHECK POSTAL CODE
-            if (!Regex.IsMatch(userDTO.postalCode, @"^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$"))
+            if (!Regex.IsMatch(userLoginDTO.postalCode, @"^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$"))
             {
                 return "Invalid postal code format.";
             }
 
-            // MAKE API CALL TO ADD USER
-            var response = await _httpClient.PostAsJsonAsync("api/User", userDTO);
-            var content = await response.Content.ReadAsStringAsync();
-
-            if (!response.IsSuccessStatusCode)
+            UserDTO userDTO = new UserDTO
             {
-                throw new Exception($"Error adding user: {content}");
+                userNum = userLoginDTO.userNum,
+                firstName = userLoginDTO.firstName,
+                middleName = userLoginDTO.middleName,
+                lastName = userLoginDTO.lastName,
+                birthday = userLoginDTO.birthday,
+                socialInsuranceNum = userLoginDTO.socialInsuranceNum,
+                email = userLoginDTO.email,
+                phoneNum = userLoginDTO.phoneNum,
+                streetAddress = userLoginDTO.streetAddress,
+                city = userLoginDTO.city,
+                province = userLoginDTO.province,
+                postalCode = userLoginDTO.postalCode,
+                isAdmin = userLoginDTO.isAdmin
+
+            };
+
+            LoginDTO loginDTO = new LoginDTO
+            {
+                userId = userLoginDTO.userId,
+                password = userLoginDTO.password,
+                userNum = userLoginDTO.userNum
+
+            };
+
+            // MAKE API CALL TO ADD USER
+            var userResponse = await _httpClient.PostAsJsonAsync("api/User", userDTO);
+            var userContent = await userResponse.Content.ReadAsStringAsync();
+
+            if (!userResponse.IsSuccessStatusCode)
+            {
+                throw new Exception($"Error adding user: {userContent}");
             }
+
+            // MAKE API CALL TO ADD USER LOGIN
+            var loginResponse = await _httpClient.PostAsJsonAsync("api/Login", loginDTO);
+            var loginContent = await loginResponse.Content.ReadAsStringAsync();
+            if (!loginResponse.IsSuccessStatusCode)
+            {
+                // rollback addition of user
+                var deleteResponse = await _httpClient.DeleteAsync($"api/User/{userDTO.userNum}");
+                if (!deleteResponse.IsSuccessStatusCode)
+                {
+                    throw new Exception($"Error adding login and rollback failed: {await deleteResponse.Content.ReadAsStringAsync()}");
+                }
+                throw new Exception($"Error adding login information: {loginContent}");
+            }
+
+
 
             return "OK";
         }
